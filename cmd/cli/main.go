@@ -1,7 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"github.com/k0marov/gometa/lib/schema"
+	"log"
+	"os"
+)
 
 func main() {
-	fmt.Print("Hello, world!")
+	ent := schema.Parse(os.Args[1])
+	log.Printf("Got schema %#v", ent)
 }
