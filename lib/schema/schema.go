@@ -3,15 +3,16 @@ package schema
 import (
 	"log"
 	"reflect"
-	"time"
 )
 
 type Entity struct {
-	Name   string
-	Fields []Field
+	Name     string
+	JsonName string
+	Fields   []Field
 }
 
 type Field struct {
+	GoName   string
 	JsonName string
 	Type     FieldType
 }
@@ -19,16 +20,14 @@ type Field struct {
 type FieldType string
 
 const (
-	Int        = FieldType("int")
-	Float      = FieldType("float")
-	Bool       = FieldType("bool")
-	String     = FieldType("string")
-	TimeString = FieldType("time_string")
-	TimeUnix   = FieldType("time_unix")
+	Int      = FieldType("int")
+	Float    = FieldType("float")
+	Bool     = FieldType("bool")
+	String   = FieldType("string")
+	TimeUnix = FieldType("time_unix")
 )
 
 const UnixTimeExample = 1694801985
-const StringTimeExample = time.RFC3339
 
 func fieldTypeFromInterface(i any) FieldType {
 	kind := reflect.TypeOf(i).Kind()
@@ -45,10 +44,6 @@ func fieldTypeFromInterface(i any) FieldType {
 	case reflect.Bool:
 		return Bool
 	case reflect.String:
-		str := i.(string)
-		if str == StringTimeExample {
-			return TimeString
-		}
 		return String
 	}
 	log.Fatalf("got field type %#v of unknown kind %s", i, kind.String())
@@ -63,10 +58,8 @@ func (t FieldType) GolangType() string {
 		return "float64"
 	case String:
 		return "string"
-	case TimeString:
-		return "time.Time"
 	case TimeUnix:
-		return "time.Time"
+		return "int"
 	}
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"

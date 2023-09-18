@@ -10,28 +10,28 @@ import (
 )
 
 const PrimaryKeyName = "id"
-const PrimaryKeyType = Int
 
 func Parse(filePath string) Entity {
 	jsonEntity := parseJsonFile(filePath)
 	log.Printf("succesffuly unmarshalled entity scheme at %q", filePath)
 
 	_, fileName := filepath.Split(filePath)
+	jsonName := strings.ReplaceAll(fileName, ".json", "")
 	ent := Entity{
-		Name:   helpers.JsonNameToCamelCase(strings.ReplaceAll(fileName, ".json", "")),
-		Fields: []Field{},
+		JsonName: jsonName,
+		Name:     helpers.JsonNameToPascalCase(jsonName),
+		Fields:   []Field{},
 	}
 	hasPrimaryKey := false
 	for name, exampleValue := range jsonEntity {
 		field := Field{
 			JsonName: name,
+			GoName:   helpers.JsonNameToPascalCase(name),
 			Type:     fieldTypeFromInterface(exampleValue),
 		}
 		if field.JsonName == PrimaryKeyName {
 			hasPrimaryKey = true
-			if field.Type != PrimaryKeyType {
-				log.Fatalf("field name %q is reserved for primary key, it must be of type %q", PrimaryKeyName, PrimaryKeyType)
-			}
+			field.GoName = "ID" // convention of gorm
 		}
 		ent.Fields = append(ent.Fields, field)
 	}

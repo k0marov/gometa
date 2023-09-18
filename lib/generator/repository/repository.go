@@ -25,9 +25,9 @@ func New{{ .EntityName }}Repository(db *gorm.DB) {{ .EntityName }}Repository {
     return {{ .EntityName }}Repository{ db: db}
 }
 
-func (r {{ .EntityName }}Repository) Get({{ .PrimaryName }} {{ .PrimaryType}}) (*{{ .EntityName }}, error) {
+func (r {{ .EntityName }}Repository) Get(id uint64) (*{{ .EntityName }}, error) {
     entity := new({{ .EntityName }})
-    err := r.db.Limit(1).Where("{{ .PrimarySQLName }} = ?", {{ .PrimaryName }}).Find(entity).Error()
+    err := r.db.Limit(1).Where("id = ?", id).Find(entity).Error()
     return entity, err
 }
 
@@ -50,23 +50,15 @@ func (r {{ .EntityName }}Repository) Delete(entity *{{ .EntityName }}) error {
 `))
 
 func Generate(ent schema.Entity, entityPackagePath string, out io.Writer) {
-	log.Printf("Generating repository code...")
 	templateData := struct {
-		EntityPackage  string
-		EntityName     string
-		PrimaryType    string
-		PrimaryName    string
-		PrimarySQLName string
+		EntityPackage string
+		EntityName    string
 	}{
-		EntityPackage:  entityPackagePath,
-		EntityName:     ent.Name,
-		PrimaryType:    schema.PrimaryKeyType.GolangType(),
-		PrimaryName:    schema.PrimaryKeyName,
-		PrimarySQLName: schema.PrimaryKeyName,
+		EntityPackage: entityPackagePath,
+		EntityName:    ent.Name,
 	}
 	err := repoTemplate.Execute(out, templateData)
 	if err != nil {
 		log.Fatalf("error while executing repository template: %v", err)
 	}
-	log.Printf("Successfully generated repository code")
 }
