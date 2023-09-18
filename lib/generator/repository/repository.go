@@ -10,11 +10,10 @@ import (
 // TODO: add logs and error wraps in repo template
 // TODO: add creating SQL table in repo
 var repoTemplate = template.Must(template.New("").Parse(`
-package repository
+package {{ .PackageName }} 
 
 import (
     "github.com/jinzhu/gorm"
-    . {{ .EntityPackage }} 
 )
 
 type {{ .EntityName }}Repository struct {
@@ -37,11 +36,7 @@ func (r {{ .EntityName }}Repository) Create(entity *{{ .EntityName }}) error {
 }
 
 func (r {{ .EntityName }}Repository) Update(entity *{{ .EntityName }}) error {
-    return r.db.Model(entity).Update.Error
-}
-
-func (r {{ .EntityName }}Repository) Update(entity *{{ .EntityName }}) error {
-    return r.db.Model(entity).Update.Error
+    return r.db.Model(entity).Update(entity).Error
 }
 
 func (r {{ .EntityName }}Repository) Delete(entity *{{ .EntityName }}) error {
@@ -49,13 +44,15 @@ func (r {{ .EntityName }}Repository) Delete(entity *{{ .EntityName }}) error {
 }
 `))
 
-func Generate(ent schema.Entity, entityPackagePath string, out io.Writer) {
+func Generate(ent schema.Entity, out io.Writer) {
 	templateData := struct {
-		EntityPackage string
-		EntityName    string
+		PackageName string
+		//EntityPackage string
+		EntityName string
 	}{
-		EntityPackage: entityPackagePath,
-		EntityName:    ent.Name,
+		PackageName: ent.JsonName,
+		//EntityPackage: entityPackagePath,
+		EntityName: ent.Name,
 	}
 	err := repoTemplate.Execute(out, templateData)
 	if err != nil {
