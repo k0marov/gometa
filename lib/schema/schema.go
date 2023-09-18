@@ -7,12 +7,13 @@ import (
 )
 
 type Entity struct {
+	Name   string
 	Fields []Field
 }
 
 type Field struct {
-	Name string
-	Type FieldType
+	JsonName string
+	Type     FieldType
 }
 
 type FieldType string
@@ -52,4 +53,21 @@ func fieldTypeFromInterface(i any) FieldType {
 	}
 	log.Fatalf("got field type %#v of unknown kind %s", i, kind.String())
 	return "unknown"
+}
+
+func (t FieldType) GolangType() string {
+	switch t {
+	case Int:
+		return "int"
+	case Float:
+		return "float64"
+	case String:
+		return "string"
+	case TimeString:
+		return "time.Time"
+	case TimeUnix:
+		return "time.Time"
+	}
+	log.Panicf("Unknown field type %s", t)
+	return "UNKNOWN"
 }

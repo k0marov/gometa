@@ -2,35 +2,42 @@ package schema
 
 import (
 	"encoding/json"
+	"github.com/k0marov/gometa/lib/helpers"
 	"log"
 	"os"
+	"path/filepath"
+	"strings"
 )
 
-const primaryKeyName = "id"
-const primaryKeyType = Int
+const PrimaryKeyName = "id"
+const PrimaryKeyType = Int
 
 func Parse(filePath string) Entity {
 	jsonEntity := parseJsonFile(filePath)
 	log.Printf("succesffuly unmarshalled entity scheme at %q", filePath)
 
-	ent := Entity{Fields: []Field{}}
+	_, fileName := filepath.Split(filePath)
+	ent := Entity{
+		Name:   helpers.JsonNameToCamelCase(strings.ReplaceAll(fileName, ".json", "")),
+		Fields: []Field{},
+	}
 	hasPrimaryKey := false
 	for name, exampleValue := range jsonEntity {
 		field := Field{
-			Name: name,
-			Type: fieldTypeFromInterface(exampleValue),
+			JsonName: name,
+			Type:     fieldTypeFromInterface(exampleValue),
 		}
-		if field.Name == primaryKeyName {
+		if field.JsonName == PrimaryKeyName {
 			hasPrimaryKey = true
-			if field.Type != primaryKeyType {
-				log.Fatalf("field name %q is reserved for primary key, it must be of type %q", primaryKeyName, primaryKeyType)
+			if field.Type != PrimaryKeyType {
+				log.Fatalf("field name %q is reserved for primary key, it must be of type %q", PrimaryKeyName, PrimaryKeyType)
 			}
 		}
 		ent.Fields = append(ent.Fields, field)
 	}
 
 	if !hasPrimaryKey {
-		log.Fatalf("entity at %q does not have a primary key. Please add %q field", filePath, primaryKeyName)
+		log.Fatalf("entity at %q does not have a primary key. Please add %q field", filePath, PrimaryKeyName)
 	}
 
 	return ent
