@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -34,6 +35,9 @@ func Parse(filePath string) Entity {
 			field.GoName = "ID" // convention of gorm
 		}
 		ent.Fields = append(ent.Fields, field)
+		sort.Slice(ent.Fields, func(i, j int) bool {
+			return ent.Fields[i].GoName < ent.Fields[j].GoName
+		})
 	}
 
 	if !hasPrimaryKey {
