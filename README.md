@@ -40,7 +40,10 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] Generating repository layer
 - [x] Generating entity struct
 - [x] Generating service layer 
-- [ ] Generating http handlers layer
+- [x] Generating http handlers layer
+- [ ] DI file 
+- [ ] Logging 
+- [ ] Error handling 
 - [ ] Customization of templates
 - [ ] CLI interface similar to protoc
 - [ ] Swagger generation

@@ -21,6 +21,7 @@ type FieldType string
 
 const (
 	Int      = FieldType("int")
+	Uint64   = FieldType("uint64")
 	Float    = FieldType("float")
 	Bool     = FieldType("bool")
 	String   = FieldType("string")
@@ -54,6 +55,8 @@ func (t FieldType) GolangType() string {
 	switch t {
 	case Int:
 		return "int"
+	case Uint64:
+		return "uint64"
 	case Float:
 		return "float64"
 	case String:

@@ -32,6 +32,8 @@ func Parse(filePath string) Entity {
 		if field.JsonName == PrimaryKeyName {
 			hasPrimaryKey = true
 			field.GoName = "ID" // convention of gorm
+			field.Type = Uint64
+			log.Printf("Changed %q field to %q with type %q because it's a convention of gorm", field.JsonName, "ID", field.Type)
 		}
 		ent.Fields = append(ent.Fields, field)
 		sort.Slice(ent.Fields, func(i, j int) bool {
