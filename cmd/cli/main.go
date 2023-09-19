@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	generator.Generate("test/results/", os.Args[1])
+	generator.Generate(os.Args[1])
 }

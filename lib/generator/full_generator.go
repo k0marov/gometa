@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 )
 
-func Generate(outDirPath, schemaPath string) {
+func Generate(schemaPath string) {
 	ent := schema.Parse(schemaPath)
-	crudDir := filepath.Join(outDirPath, ent.JsonName)
+	crudDir := filepath.Dir(schemaPath)
 
 	entityFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "entity.go"))
 	entity_struct.Generate(ent, entityFile)

@@ -17,7 +17,7 @@ func Parse(filePath string) Entity {
 	log.Printf("succesffuly unmarshalled entity scheme at %q", filePath)
 
 	_, fileName := filepath.Split(filePath)
-	jsonName := strings.ReplaceAll(fileName, ".json", "")
+	jsonName := strings.Split(fileName, ".")[0]
 	ent := Entity{
 		JsonName: jsonName,
 		Name:     helpers.JsonNameToPascalCase(jsonName),
@@ -50,7 +50,7 @@ func Parse(filePath string) Entity {
 func parseJsonFile(filePath string) map[string]any {
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatalf("unable to open entity scheme file %q: %v", filePath, err)
+		log.Fatalf("unable to open entity scheme file: %v", err)
 	}
 	entityScheme := map[string]any{}
 	err = json.NewDecoder(file).Decode(&entityScheme)
