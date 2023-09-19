@@ -13,8 +13,8 @@ var serviceTemplate = template.Must(template.New("").Parse(`
 package {{ .PackageName }} 
 
 type {{ .EntityName }}Repository interface {
-    Get(id uint64) (*{{ .EntityName }}, error) 
     Create(entity *{{ .EntityName }}) error 
+    Get(id uint64) (*{{ .EntityName }}, error) 
     Update(entity *{{ .EntityName }}) error 
     Delete(entity *{{ .EntityName }}) error 
 }
@@ -27,15 +27,15 @@ func New{{ .EntityName }}ServiceImpl(repo {{ .EntityName }}Repository) *{{ .Enti
     return &{{ .EntityName }}ServiceImpl{repo: repo}
 }
 
+func (s *{{ .EntityName }}ServiceImpl) Create(entity *{{ .EntityName }}) error {
+    // TODO: add business logic to {{ .EntityName }}Service.Create
+    return s.repo.Create(entity)
+}
+
 func (s *{{ .EntityName }}ServiceImpl) Get(id uint64) (*{{ .EntityName }}, error) {
     entity, err := s.repo.Get(id)
     // TODO: add business logic to {{ .EntityName }}Service.Get
     return entity, err
-}
-
-func (s *{{ .EntityName }}ServiceImpl) Create(entity *{{ .EntityName }}) error {
-    // TODO: add business logic to {{ .EntityName }}Service.Create
-    return s.repo.Create(entity)
 }
 
 func (s *{{ .EntityName }}ServiceImpl) Update(entity *{{ .EntityName }}) error {

@@ -26,15 +26,14 @@ func New{{ .EntityName }}RepositoryImpl(db *gorm.DB) {{ .EntityName }}Repository
     return {{ .EntityName }}RepositoryImpl{db: db}
 }
 
+func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) error {
+    return r.db.Create(entity).Error
+}
+
 func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
     entity := new({{ .EntityName }})
     err := r.db.Limit(1).Where("id = ?", id).Find(entity).Error()
     return entity, err
-}
-
-
-func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) error {
-    return r.db.Create(entity).Error
 }
 
 func (r {{ .EntityName }}RepositoryImpl) Update(entity *{{ .EntityName }}) error {

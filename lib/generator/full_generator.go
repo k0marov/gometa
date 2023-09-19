@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"github.com/k0marov/gometa/lib/generator/delivery"
 	"github.com/k0marov/gometa/lib/generator/entity_struct"
 	"github.com/k0marov/gometa/lib/generator/repository"
 	"github.com/k0marov/gometa/lib/generator/service"
@@ -21,4 +22,7 @@ func Generate(schemaPath string) {
 
 	serviceFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "service.go"))
 	service.Generate(ent, serviceFile)
+
+	deliveryFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery.go"))
+	delivery.Generate(ent, deliveryFile)
 }
