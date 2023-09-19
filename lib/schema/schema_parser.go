@@ -14,7 +14,6 @@ const PrimaryKeyName = "id"
 
 func Parse(filePath string) Entity {
 	jsonEntity := parseJsonFile(filePath)
-	log.Printf("succesffuly unmarshalled entity scheme at %q", filePath)
 
 	_, fileName := filepath.Split(filePath)
 	jsonName := strings.Split(fileName, ".")[0]

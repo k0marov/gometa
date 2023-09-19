@@ -39,7 +39,7 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] Parsing the entity scheme
 - [x] Generating repository layer
 - [x] Generating entity struct
-- [ ] Generating service layer with a separate unfilled pure business logic layer
+- [x] Generating service layer 
 - [ ] Generating http handlers layer
 - [ ] Customization of templates
 - [ ] CLI interface similar to protoc

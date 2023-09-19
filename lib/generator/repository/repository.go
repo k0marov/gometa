@@ -23,7 +23,7 @@ type {{ .EntityName }}RepositoryImpl struct {
 }
 
 func New{{ .EntityName }}RepositoryImpl(db *gorm.DB) {{ .EntityName }}RepositoryImpl {
-    return {{ .EntityName }}Repository{ db: db}
+    return {{ .EntityName }}RepositoryImpl{db: db}
 }
 
 func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
