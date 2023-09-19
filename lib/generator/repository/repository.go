@@ -18,30 +18,30 @@ import (
     "github.com/jinzhu/gorm"
 )
 
-type {{ .EntityName }}Repository struct {
+type {{ .EntityName }}RepositoryImpl struct {
     db *gorm.DB
 }
 
-func New{{ .EntityName }}Repository(db *gorm.DB) {{ .EntityName }}Repository {
+func New{{ .EntityName }}RepositoryImpl(db *gorm.DB) {{ .EntityName }}RepositoryImpl {
     return {{ .EntityName }}Repository{ db: db}
 }
 
-func (r {{ .EntityName }}Repository) Get(id uint64) (*{{ .EntityName }}, error) {
+func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
     entity := new({{ .EntityName }})
     err := r.db.Limit(1).Where("id = ?", id).Find(entity).Error()
     return entity, err
 }
 
 
-func (r {{ .EntityName }}Repository) Create(entity *{{ .EntityName }}) error {
+func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) error {
     return r.db.Create(entity).Error
 }
 
-func (r {{ .EntityName }}Repository) Update(entity *{{ .EntityName }}) error {
+func (r {{ .EntityName }}RepositoryImpl) Update(entity *{{ .EntityName }}) error {
     return r.db.Model(entity).Update(entity).Error
 }
 
-func (r {{ .EntityName }}Repository) Delete(entity *{{ .EntityName }}) error {
+func (r {{ .EntityName }}RepositoryImpl) Delete(entity *{{ .EntityName }}) error {
     return r.db.Delete(entity).Error
 }
 `))
