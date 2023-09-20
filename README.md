@@ -41,6 +41,7 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] Generating entity struct
 - [x] Generating service layer 
 - [x] Generating http handlers layer
+- [x] Split layers into separate directories
 - [ ] DI file 
 - [ ] Logging 
 - [ ] Error handling 

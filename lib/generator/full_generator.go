@@ -11,18 +11,23 @@ import (
 )
 
 func Generate(schemaPath string) {
+	schemaPath, _ = filepath.Abs(schemaPath)
+
 	ent := schema.Parse(schemaPath)
 	crudDir := filepath.Dir(schemaPath)
 
-	entityFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "entity.go"))
-	entity_struct.Generate(ent, entityFile)
+	packageName := filepath.Base(crudDir)
 
-	repoFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "repository.go"))
-	repository.Generate(ent, repoFile)
+	entityFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "entity", "entity.go"))
+	entity_struct.Generate(ent, entityFile, packageName)
+	entityImportPath := helpers.GetGoImportPath(filepath.Join(crudDir, "entity"))
 
-	serviceFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "service.go"))
-	service.Generate(ent, serviceFile)
+	repoFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "repository", "repository.go"))
+	repository.Generate(ent, repoFile, entityImportPath)
 
-	deliveryFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery.go"))
-	delivery.Generate(ent, deliveryFile)
+	serviceFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "service", "service.go"))
+	service.Generate(ent, serviceFile, entityImportPath)
+
+	deliveryFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery", "delivery.go"))
+	delivery.Generate(ent, deliveryFile, entityImportPath)
 }
