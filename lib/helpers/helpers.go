@@ -45,12 +45,13 @@ func WriteFormatted(source []byte, out io.Writer) {
 
 func GetGoImportPath(filepath string) string {
 	c := exec.Command("go", "list", filepath)
-	var stdout bytes.Buffer
-	c.Stdout = &stdout
+	var output bytes.Buffer
+	c.Stdout = &output
+	c.Stderr = &output
 	err := c.Run()
 	if err != nil {
-		log.Fatalf("failed getting package name for %q: %v", filepath, err)
+		log.Fatalf("failed getting package name for %q: %v. Output: %q", filepath, err, output.String())
 	}
-	result := stdout.String()
+	result := output.String()
 	return result[:len(result)-1] // remove EOF from the end
 }
