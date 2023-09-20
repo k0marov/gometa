@@ -5,9 +5,11 @@ import (
 	"github.com/k0marov/gometa/lib/generator/entity_struct"
 	"github.com/k0marov/gometa/lib/generator/repository"
 	"github.com/k0marov/gometa/lib/generator/service"
+	"github.com/k0marov/gometa/lib/generator/setup"
 	"github.com/k0marov/gometa/lib/helpers"
 	"github.com/k0marov/gometa/lib/schema"
 	"path/filepath"
+	"strings"
 )
 
 func Generate(schemaPath string) {
@@ -20,7 +22,9 @@ func Generate(schemaPath string) {
 
 	entityFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "entity", "entity.go"))
 	entity_struct.Generate(ent, entityFile, packageName)
+
 	entityImportPath := helpers.GetGoImportPath(filepath.Join(crudDir, "entity"))
+	basePackagePath := strings.TrimSuffix(entityImportPath, "/entity")
 
 	repoFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "repository", "repository.go"))
 	repository.Generate(ent, repoFile, entityImportPath)
@@ -30,4 +34,7 @@ func Generate(schemaPath string) {
 
 	deliveryFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery", "delivery.go"))
 	delivery.Generate(ent, deliveryFile, entityImportPath)
+
+	setupFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "setup.go"))
+	setup.Generate(ent, setupFile, packageName, basePackagePath)
 }
