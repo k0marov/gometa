@@ -43,8 +43,11 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] Generating http handlers layer
 - [x] Split layers into separate directories
 - [x] DI file 
-- [ ] Logging 
+- [ ] API Endpoints file
+- [ ] Logs
+- [ ] Logging in templates
 - [ ] Error handling 
+- [ ] Acceptance test for generator
 - [ ] Customization of templates
 - [ ] CLI interface similar to protoc
 - [ ] Swagger generation
