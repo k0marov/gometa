@@ -19,7 +19,7 @@ import (
 func Add{{.Entity.Name}}Group(h *{{.Entity.Name}}Handlers, router *gin.RouterGroup) {
 	g := router.Group("{{.Entity.JsonName}}")
     g.POST("/", h.Create)
-	g.GET("/{id}", h.Get) 
+	g.GET("/:id", h.Get) 
     g.PUT("/", h.Update) 
 	g.DELETE("/", h.Delete)
 }

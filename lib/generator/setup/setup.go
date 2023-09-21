@@ -13,7 +13,7 @@ var setupTemplate = template.Must(template.New("").Parse(`
 package {{ .PackageName }} 
 
 import (
-    "github.com/jinzhu/gorm"
+    "gorm.io/gorm"
     "{{ .BasePackage }}/delivery"
     "{{ .BasePackage }}/service"
     "{{ .BasePackage }}/repository"

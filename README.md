@@ -43,7 +43,7 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] Generating http handlers layer
 - [x] Split layers into separate directories
 - [x] DI file 
-- [ ] API Endpoints file
+- [x] API Endpoints file
 - [ ] Logs
 - [ ] Logging in templates
 - [ ] Error handling 

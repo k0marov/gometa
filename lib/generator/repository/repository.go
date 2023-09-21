@@ -15,7 +15,7 @@ var repoTemplate = template.Must(template.New("").Parse(`
 package repository 
 
 import (
-    "github.com/jinzhu/gorm"
+    "gorm.io/gorm"
     . "{{.EntityImport}}"
 )
 
@@ -34,12 +34,12 @@ func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) error
 
 func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
     entity := new({{ .EntityName }})
-    err := r.db.Limit(1).Where("id = ?", id).Find(entity).Error()
+    err := r.db.Limit(1).Where("id = ?", id).Find(entity).Error
     return entity, err
 }
 
 func (r {{ .EntityName }}RepositoryImpl) Update(entity *{{ .EntityName }}) error {
-    return r.db.Model(entity).Update(entity).Error
+    return r.db.Model(entity).Updates(entity).Error
 }
 
 func (r {{ .EntityName }}RepositoryImpl) Delete(entity *{{ .EntityName }}) error {
