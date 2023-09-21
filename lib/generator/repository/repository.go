@@ -24,6 +24,7 @@ type {{ .EntityName }}RepositoryImpl struct {
 }
 
 func New{{ .EntityName }}RepositoryImpl(db *gorm.DB) {{ .EntityName }}RepositoryImpl {
+    db.AutoMigrate(&{{.EntityName}}{})
     return {{ .EntityName }}RepositoryImpl{db: db}
 }
 
