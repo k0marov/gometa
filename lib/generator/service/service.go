@@ -20,7 +20,7 @@ type {{ .EntityName }}Repository interface {
     Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error)
     Get(id uint64) (*{{ .EntityName }}, error) 
     Update(entity *{{ .EntityName }}) error 
-    Delete(entity *{{ .EntityName }}) error 
+    Delete(id uint64) error 
 }
 
 type {{ .EntityName }}ServiceImpl struct {
@@ -47,9 +47,9 @@ func (s *{{ .EntityName }}ServiceImpl) Update(entity *{{ .EntityName }}) error {
     return s.repo.Update(entity)
 }
 
-func (s *{{ .EntityName }}ServiceImpl) Delete(entity *{{ .EntityName }}) error {
+func (s *{{ .EntityName }}ServiceImpl) Delete(id uint64) error {
     // TODO: add business logic to {{ .EntityName }}Service.Delete
-    return s.repo.Delete(entity)
+    return s.repo.Delete(id)
 }
 `))
 

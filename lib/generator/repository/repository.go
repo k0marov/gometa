@@ -34,7 +34,7 @@ func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) (*{{.
 
 func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
     entity := new({{ .EntityName }})
-    err := r.db.Limit(1).Where("id = ?", id).Find(entity).Error
+    err := r.db.Limit(1).Where("id = ?", id).First(entity).Error
     return entity, err
 }
 
@@ -42,8 +42,8 @@ func (r {{ .EntityName }}RepositoryImpl) Update(entity *{{ .EntityName }}) error
     return r.db.Model(entity).Updates(entity).Error
 }
 
-func (r {{ .EntityName }}RepositoryImpl) Delete(entity *{{ .EntityName }}) error {
-    return r.db.Delete(entity).Error
+func (r {{ .EntityName }}RepositoryImpl) Delete(id uint64) error {
+    return r.db.Delete(&{{.EntityName}}{}, id).Error
 }
 `))
 

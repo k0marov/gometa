@@ -28,8 +28,6 @@ func SetupHandlers(db *gorm.DB) *delivery.{{ .EntityName }}Handlers {
 }
 `))
 
-// TODO: add returning id from Create
-
 func Generate(ent schema.Entity, out io.Writer, packageName, basePackage string) {
 	templateData := struct {
 		EntityName  string

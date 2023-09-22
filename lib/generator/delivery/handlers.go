@@ -23,7 +23,7 @@ type {{ .EntityName }}Service interface {
     Create(entity *{{ .EntityName }}) (*{{ .EntityName }}, error)
     Get(id uint64) (*{{ .EntityName }}, error) 
     Update(entity *{{ .EntityName }}) error 
-    Delete(entity *{{ .EntityName }}) error 
+    Delete(id uint64) error 
 }
 
 type {{ .EntityName }}Handlers struct {
@@ -75,11 +75,12 @@ func (h *{{ .EntityName }}Handlers) Update(c *gin.Context) {
 }
 
 func (h *{{ .EntityName }}Handlers) Delete(c *gin.Context) { 
-    toDel := new({{ .EntityName }}) 
-    if c.BindJSON(&toDel) != nil {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+    if err != nil {
+        c.String(http.StatusBadRequest, "invalid id parameter") 
         return 
     }
-    err := h.svc.Delete(toDel)
+    err = h.svc.Delete(id)
     if err != nil {
         c.Error(err)
         return 
@@ -88,7 +89,7 @@ func (h *{{ .EntityName }}Handlers) Delete(c *gin.Context) {
 }
 `))
 
-// TODO: deletion by just id
+// TODO: remove code duplication of getting id param
 
 func GenerateHandlers(ent schema.Entity, out io.Writer, entityImport string) {
 	templateData := struct {

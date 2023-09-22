@@ -21,7 +21,7 @@ func Add{{.Entity.Name}}Group(h *{{.Entity.Name}}Handlers, router *gin.RouterGro
     g.POST("/", h.Create)
 	g.GET("/:id", h.Get) 
     g.PUT("/", h.Update) 
-	g.DELETE("/", h.Delete)
+	g.DELETE("/:id", h.Delete)
 }
 `))
 
