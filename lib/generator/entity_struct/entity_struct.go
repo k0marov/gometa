@@ -31,5 +31,7 @@ func Generate(ent schema.Entity, out io.Writer, packageName string) {
 	if err != nil {
 		log.Fatalf("error while executing entity struct template: %v", err)
 	}
-	helpers.WriteFormatted(generated.Bytes(), out)
+	if err := helpers.WriteFormatted(generated.Bytes(), out); err != nil {
+		log.Fatalf("while formatting entity struct file: %v", err)
+	}
 }

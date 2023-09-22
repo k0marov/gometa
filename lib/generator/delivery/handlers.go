@@ -20,7 +20,7 @@ import (
 )
 
 type {{ .EntityName }}Service interface {
-    Create(entity *{{ .EntityName }}) error 
+    Create(entity *{{ .EntityName }}) (*{{ .EntityName }}, error)
     Get(id uint64) (*{{ .EntityName }}, error) 
     Update(entity *{{ .EntityName }}) error 
     Delete(entity *{{ .EntityName }}) error 
@@ -39,12 +39,12 @@ func (h *{{ .EntityName }}Handlers) Create(c *gin.Context) {
     if c.BindJSON(toCreate) != nil {
         return 
     }
-    err := h.svc.Create(toCreate)
+    created, err := h.svc.Create(toCreate)
     if err != nil {
         c.Error(err)
         return 
     }
-	c.Status(http.StatusOK) 
+	c.JSON(http.StatusOK, created) 
 }
 
 func (h *{{ .EntityName }}Handlers) Get(c *gin.Context) { 
@@ -103,5 +103,7 @@ func GenerateHandlers(ent schema.Entity, out io.Writer, entityImport string) {
 	if err != nil {
 		log.Fatalf("error while executing handlers template: %v", err)
 	}
-	helpers.WriteFormatted(generated.Bytes(), out)
+	if err := helpers.WriteFormatted(generated.Bytes(), out); err != nil {
+		log.Fatalf("while formatting handlers file: %v", err)
+	}
 }

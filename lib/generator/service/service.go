@@ -17,7 +17,7 @@ import (
 )
 
 type {{ .EntityName }}Repository interface {
-    Create(entity *{{ .EntityName }}) error 
+    Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error)
     Get(id uint64) (*{{ .EntityName }}, error) 
     Update(entity *{{ .EntityName }}) error 
     Delete(entity *{{ .EntityName }}) error 
@@ -31,7 +31,7 @@ func New{{ .EntityName }}ServiceImpl(repo {{ .EntityName }}Repository) *{{ .Enti
     return &{{ .EntityName }}ServiceImpl{repo: repo}
 }
 
-func (s *{{ .EntityName }}ServiceImpl) Create(entity *{{ .EntityName }}) error {
+func (s *{{ .EntityName }}ServiceImpl) Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error) {
     // TODO: add business logic to {{ .EntityName }}Service.Create
     return s.repo.Create(entity)
 }
@@ -68,5 +68,7 @@ func Generate(ent schema.Entity, out io.Writer, entityImport string) {
 	if err != nil {
 		log.Fatalf("error while executing service template: %v", err)
 	}
-	helpers.WriteFormatted(generated.Bytes(), out)
+	if err := helpers.WriteFormatted(generated.Bytes(), out); err != nil {
+		log.Fatalf("while formatting service file: %v", err)
+	}
 }

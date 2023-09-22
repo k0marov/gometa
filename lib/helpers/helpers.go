@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"bytes"
+	"fmt"
 	"go/format"
 	"io"
 	"log"
@@ -31,16 +32,16 @@ func CreateFileRecursively(path string) (file *os.File) {
 	return file
 }
 
-func WriteFormatted(source []byte, out io.Writer) {
+func WriteFormatted(source []byte, out io.Writer) error {
 	formatted, err := format.Source(source)
 	if err != nil {
-		log.Fatalf("error when applying go fmt: %v", err)
-		return
+		return fmt.Errorf("error when applying go fmt: %w", err)
 	}
 	_, err = out.Write(formatted)
 	if err != nil {
-		log.Fatalf("error when writing formatted code to output file: %v", err)
+		return fmt.Errorf("error when writing formatted code to output file: %w", err)
 	}
+	return nil
 }
 
 func GetGoImportPath(filepath string) string {

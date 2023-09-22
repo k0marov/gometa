@@ -36,5 +36,7 @@ func GenerateEndpoints(ent schema.Entity, out io.Writer) {
 	if err != nil {
 		log.Fatalf("error while executing endpoints template: %v", err)
 	}
-	helpers.WriteFormatted(generated.Bytes(), out)
+	if err := helpers.WriteFormatted(generated.Bytes(), out); err != nil {
+		log.Fatalf("while formatting endpoints file: %v", err)
+	}
 }

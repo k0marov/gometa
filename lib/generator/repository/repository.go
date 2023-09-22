@@ -28,8 +28,8 @@ func New{{ .EntityName }}RepositoryImpl(db *gorm.DB) {{ .EntityName }}Repository
     return {{ .EntityName }}RepositoryImpl{db: db}
 }
 
-func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) error {
-    return r.db.Create(entity).Error
+func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error) {
+    return entity, r.db.Create(entity).Error
 }
 
 func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
@@ -60,5 +60,7 @@ func Generate(ent schema.Entity, out io.Writer, entityImport string) {
 	if err != nil {
 		log.Fatalf("error while executing repository template: %v", err)
 	}
-	helpers.WriteFormatted(generated.Bytes(), out)
+	if err := helpers.WriteFormatted(generated.Bytes(), out); err != nil {
+		log.Fatalf("while formatting repository file: %v", err)
+	}
 }
