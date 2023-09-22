@@ -16,8 +16,7 @@ import (
     "github.com/gin-gonic/gin"
 )
 
-func Add{{.Entity.Name}}Group(h *{{.Entity.Name}}Handlers, router *gin.RouterGroup) {
-	g := router.Group("{{.Entity.JsonName}}")
+func Add{{.Entity.Name}}Group(h *{{.Entity.Name}}Handlers, g *gin.RouterGroup) {
     g.POST("/", h.Create)
 	g.GET("/:id", h.Get) 
     g.PUT("/", h.Update) 
