@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"github.com/k0marov/gometa/lib/generator/base_main"
 	"github.com/k0marov/gometa/lib/generator/delivery"
 	"github.com/k0marov/gometa/lib/generator/entity_struct"
 	"github.com/k0marov/gometa/lib/generator/repository"
@@ -12,7 +13,7 @@ import (
 	"strings"
 )
 
-func Generate(schemaPath string) {
+func Generate(schemaPath string, withMain bool) {
 	schemaPath, _ = filepath.Abs(schemaPath)
 
 	ent := schema.Parse(schemaPath)
@@ -40,4 +41,7 @@ func Generate(schemaPath string) {
 
 	setupFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "setup.go"))
 	setup.Generate(ent, setupFile, packageName, basePackagePath)
+
+	baseMainFile := helpers.CreateFileRecursively(filepath.Join(filepath.Dir(crudDir), "main.go"))
+	base_main.Generate(ent, baseMainFile, basePackagePath)
 }

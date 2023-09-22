@@ -44,6 +44,7 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] Split layers into separate directories
 - [x] DI file 
 - [x] API Endpoints file
+- [x] Generating base main file
 - [ ] Logs
 - [ ] Logging in templates
 - [ ] Error handling 
