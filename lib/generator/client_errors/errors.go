@@ -19,6 +19,7 @@ var clientErrorsTemplate = template.Must(template.New("").Parse(`
 	)
 	
 	var Err{{.EntityName}}NotFound = errors.New("{{.EntityNameLower}} not found")
+	var ErrInvalidIDParam = errors.New("query id parameter must be an integer")
 
 	func ErrorHandlingMiddleware() gin.HandlerFunc {
 		return func(c *gin.Context) {
@@ -31,6 +32,8 @@ var clientErrorsTemplate = template.Must(template.New("").Parse(`
 			// Add other error checks here
 			if errors.Is(lastErr, Err{{.EntityName}}NotFound) {
 				c.JSON(http.StatusNotFound, Err{{.EntityName}}NotFound.Error())
+			} else if errors.Is(lastErr, ErrInvalidIDParam) {
+				c.JSON(http.StatusBadRequest, ErrInvalidIDParam.Error()) 
 			} else {
 				c.Status(http.StatusInternalServerError)
 			}

@@ -16,6 +16,8 @@ package main
 import (
 	"{{.PackageImport}}"
 	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+    "github.com/gin-gonic/gin"
 )
 
 func main() {

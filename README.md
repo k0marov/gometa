@@ -45,10 +45,10 @@ Currently, Gometa is just an idea. It looks like a hard task, and I will try to 
 - [x] DI file 
 - [x] API Endpoints file
 - [x] Generating base main file
+- [x] Error handling
 - [ ] Passing context to service layer
 - [ ] Logs
 - [ ] Logging in templates
-- [ ] Error handling 
 - [ ] Acceptance test for generator
 - [ ] Customization of templates
 - [ ] CLI interface similar to protoc

@@ -30,15 +30,16 @@ func Generate(schemaPath string, withMain bool) {
 
 	clientErrorsFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "client_errors", "client_errors.go"))
 	client_errors.Generate(ent.Name, clientErrorsFile)
+	clientErrorsImportPath := filepath.Join(basePackagePath, "client_errors")
 
 	repoFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "repository", "repository.go"))
-	repository.Generate(ent, repoFile, entityImportPath)
+	repository.Generate(ent, repoFile, entityImportPath, clientErrorsImportPath)
 
 	serviceFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "service", "service.go"))
 	service.Generate(ent, serviceFile, entityImportPath)
 
 	handlersFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery", "handlers.go"))
-	delivery.GenerateHandlers(ent, handlersFile, entityImportPath)
+	delivery.GenerateHandlers(ent, handlersFile, entityImportPath, clientErrorsImportPath)
 
 	setupFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "setup.go"))
 	setup.Generate(ent, setupFile, packageName, basePackagePath)
