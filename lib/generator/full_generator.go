@@ -2,6 +2,7 @@ package generator
 
 import (
 	"github.com/k0marov/gometa/lib/generator/base_main"
+	"github.com/k0marov/gometa/lib/generator/client_errors"
 	"github.com/k0marov/gometa/lib/generator/delivery"
 	"github.com/k0marov/gometa/lib/generator/entity_struct"
 	"github.com/k0marov/gometa/lib/generator/repository"
@@ -26,6 +27,9 @@ func Generate(schemaPath string, withMain bool) {
 
 	entityImportPath := helpers.GetGoImportPath(filepath.Join(crudDir, "entity"))
 	basePackagePath := strings.TrimSuffix(entityImportPath, "/entity")
+
+	clientErrorsFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "client_errors", "client_errors.go"))
+	client_errors.Generate(ent.Name, clientErrorsFile)
 
 	repoFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "repository", "repository.go"))
 	repository.Generate(ent, repoFile, entityImportPath)
