@@ -34,6 +34,13 @@ func New{{ .EntityName }}Handlers(svc {{ .EntityName }}Service) *{{ .EntityName 
     return &{{ .EntityName }}Handlers{svc: svc}
 }
 
+func (h *{{ .EntityName }}Handlers) DefineRoutes(r gin.IRouter) {
+    r.POST("/", h.Create)
+	r.GET("/:id", h.Get) 
+    r.PUT("/", h.Update) 
+	r.DELETE("/:id", h.Delete)
+}
+
 func (h *{{ .EntityName }}Handlers) Create(c *gin.Context) { 
     toCreate := new({{ .EntityName }})
     if c.BindJSON(toCreate) != nil {

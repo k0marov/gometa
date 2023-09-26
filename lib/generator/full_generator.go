@@ -36,12 +36,11 @@ func Generate(schemaPath string, withMain bool) {
 	handlersFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery", "handlers.go"))
 	delivery.GenerateHandlers(ent, handlersFile, entityImportPath)
 
-	endpointsFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery", "endpoints.go"))
-	delivery.GenerateEndpoints(ent, endpointsFile)
-
 	setupFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "setup.go"))
 	setup.Generate(ent, setupFile, packageName, basePackagePath)
 
-	baseMainFile := helpers.CreateFileRecursively(filepath.Join(filepath.Dir(crudDir), "main.go"))
-	base_main.Generate(ent, baseMainFile, basePackagePath)
+	if withMain {
+		baseMainFile := helpers.CreateFileRecursively(filepath.Join(filepath.Dir(crudDir), "main.go"))
+		base_main.Generate(ent, baseMainFile, basePackagePath)
+	}
 }

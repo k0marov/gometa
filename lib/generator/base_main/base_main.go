@@ -15,15 +15,17 @@ package main
 
 import (
 	"{{.PackageImport}}"
-	"{{.PackageImport}}/delivery"
+	"gorm.io/driver/sqlite"
 )
 
 func main() {
 	db, _ := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 	r := gin.Default()
-	handlers := {{.PackageName}}.SetupHandlers(db)
 	apiv1 := r.Group("/api/v1")
-	delivery.AddPostGroup(handlers, apiv1.Group("{{.APIGroup}}"))
+
+	handlers := {{.PackageName}}.SetupHandlers(db)
+	handlers.DefineRoutes(apiv1.Group("{{.APIGroup}}"))
+
 	r.Run()
 }
 `))
