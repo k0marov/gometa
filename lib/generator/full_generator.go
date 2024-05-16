@@ -1,51 +1,74 @@
 package generator
 
 import (
-	"github.com/k0marov/gometa/lib/generator/base_main"
-	"github.com/k0marov/gometa/lib/generator/client_errors"
+	"fmt"
 	"github.com/k0marov/gometa/lib/generator/delivery"
 	"github.com/k0marov/gometa/lib/generator/entity_struct"
 	"github.com/k0marov/gometa/lib/generator/repository"
 	"github.com/k0marov/gometa/lib/generator/service"
-	"github.com/k0marov/gometa/lib/generator/setup"
 	"github.com/k0marov/gometa/lib/helpers"
 	"github.com/k0marov/gometa/lib/schema"
+	"io"
+	"log"
+	"os"
 	"path/filepath"
 	"strings"
 )
 
-func Generate(schemaPath string, withMain bool) {
+func GetGoModuleName(goModContents io.Reader) (string, error) {
+	contents, err := io.ReadAll(goModContents)
+	if err != nil {
+		return "", fmt.Errorf("while reading from go.mod: %w", err)
+	}
+	lines := strings.Split(string(contents), "\n")
+	if len(lines) == 0 {
+		return "", fmt.Errorf("got empty contents")
+	}
+	firstLine := strings.Split(lines[0], " ")
+	if len(firstLine) != 2 {
+		return "", fmt.Errorf("invalid first go.mod line: %q", lines[0])
+	}
+	return firstLine[1], nil
+}
+
+func Generate(schemaPath, projectDir string, withMain bool) {
+	goMod, err := os.Open(filepath.Join(projectDir, "go.mod"))
+	if err != nil {
+		log.Fatalf("while opening project go.mod: %v", err)
+	}
+	defer goMod.Close()
+	moduleName, err := GetGoModuleName(goMod)
+	if err != nil {
+		log.Fatalf("getting go module name: %v", err)
+	}
+
 	schemaPath, _ = filepath.Abs(schemaPath)
 
 	ent := schema.Parse(schemaPath)
-	crudDir := filepath.Dir(schemaPath)
+	internalDir := filepath.Join(projectDir, "internal")
 
-	packageName := filepath.Base(crudDir)
+	entityFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "models", fmt.Sprintf("%s.go", ent.JsonName)))
+	entity_struct.Generate(ent, entityFile, "models")
 
-	entityFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "entity", "entity.go"))
-	entity_struct.Generate(ent, entityFile, packageName)
+	entityImportPath := fmt.Sprintf("%s/internal/models", moduleName)
 
-	entityImportPath := helpers.GetGoImportPath(filepath.Join(crudDir, "entity"))
-	basePackagePath := strings.TrimSuffix(entityImportPath, "/entity")
+	//entityImportPath := helpers.GetGoImportPath(filepath.Join(internalDir, "entity"))
+	//basePackagePath := strings.TrimSuffix(entityImportPath, "/entity")
 
-	clientErrorsFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "client_errors", "client_errors.go"))
-	client_errors.Generate(ent.Name, clientErrorsFile)
-	clientErrorsImportPath := filepath.Join(basePackagePath, "client_errors")
+	repoFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", ent.JsonName, "repository.go"))
+	repository.Generate(ent, repoFile, ent.JsonName, entityImportPath)
 
-	repoFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "repository", "repository.go"))
-	repository.Generate(ent, repoFile, entityImportPath, clientErrorsImportPath)
-
-	serviceFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "service", "service.go"))
+	serviceFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "services", fmt.Sprintf("%s.go", ent.JsonName)))
 	service.Generate(ent, serviceFile, entityImportPath)
 
-	handlersFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "delivery", "handlers.go"))
-	delivery.GenerateHandlers(ent, handlersFile, entityImportPath, clientErrorsImportPath)
+	handlersFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", ent.JsonName, "controller.go"))
+	delivery.GenerateHandlers(ent, handlersFile, ent.JsonName, entityImportPath)
 
-	setupFile := helpers.CreateFileRecursively(filepath.Join(crudDir, "setup.go"))
-	setup.Generate(ent, setupFile, packageName, basePackagePath)
+	//setupFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "setup.go"))
+	//setup.Generate(ent, setupFile, packageName, basePackagePath)
 
-	if withMain {
-		baseMainFile := helpers.CreateFileRecursively(filepath.Join(filepath.Dir(crudDir), "main.go"))
-		base_main.Generate(ent, baseMainFile, basePackagePath)
-	}
+	//if withMain {
+	//	baseMainFile := helpers.CreateFileRecursively(filepath.Join(filepath.Dir(internalDir), "main.go"))
+	//	base_main.Generate(ent, baseMainFile, basePackagePath)
+	//}
 }

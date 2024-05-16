@@ -6,5 +6,5 @@ import (
 )
 
 func main() {
-	generator.Generate(os.Args[1], true)
+	generator.Generate(os.Args[1], os.Args[2], true)
 }
