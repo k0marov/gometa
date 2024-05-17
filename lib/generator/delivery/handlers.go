@@ -17,7 +17,7 @@ import (
     "strconv"
     "github.com/gin-gonic/gin"
     "{{ .EntityImport }}"
-	//"{{ .ModuleName }}/internal/web/helpers"
+	//"{{ .ModuleName }}/internal/clienterrs"
 )
 
 type Service interface {
@@ -31,7 +31,7 @@ type Handlers struct {
     svc Service
 }
 
-func New{{ .EntityName }}Handlers(svc Service) *Handlers {
+func NewHandlers(svc Service) *Handlers {
     return &Handlers{svc: svc}
 }
 
@@ -49,21 +49,21 @@ func (h *Handlers) Create(c *gin.Context) {
     }
     created, err := h.svc.Create(toCreate)
     if err != nil {
-        c.Error(err)
+		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
-	c.JSON(http.StatusOK, created) 
+	c.JSON(http.StatusCreated, created) 
 }
 
 func (h *Handlers) Get(c *gin.Context) { 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
     if err != nil {
-        // TODO: add error
+		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrIDNotInt) 
         return 
     }
     entity, err := h.svc.Get(id)
     if err != nil {
-        c.Error(err)
+		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
     c.JSON(http.StatusOK, entity)
@@ -76,7 +76,7 @@ func (h *Handlers) Update(c *gin.Context) {
     }
     err := h.svc.Update(upd)
     if err != nil {
-        c.Error(err)
+		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
 	c.Status(http.StatusOK) 
@@ -85,15 +85,15 @@ func (h *Handlers) Update(c *gin.Context) {
 func (h *Handlers) Delete(c *gin.Context) { 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
     if err != nil {
-        // TODO: add error
+		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrIDNotInt) 
         return 
     }
     err = h.svc.Delete(id)
     if err != nil {
-        c.Error(err)
+		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
-	c.Status(http.StatusOK) 
+	c.Status(http.StatusNoContent) 
 }
 `))
 
