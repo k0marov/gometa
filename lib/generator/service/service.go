@@ -13,42 +13,42 @@ var serviceTemplate = template.Must(template.New("").Parse(`
 package services
 
 import (
-    . "{{ .EntityImport }}"
+    "{{ .EntityImport }}"
 )
 
-type {{ .EntityName }}Repository interface {
-    Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error)
-    Get(id uint64) (*{{ .EntityName }}, error) 
-    Update(entity *{{ .EntityName }}) error 
+type Repo interface {
+    Create(entity *models.{{ .EntityName }}) (*models.{{.EntityName}}, error)
+    Get(id uint64) (*models.{{ .EntityName }}, error) 
+    Update(entity *models.{{ .EntityName }}) error 
     Delete(id uint64) error 
 }
 
-type {{ .EntityName }}ServiceImpl struct {
-    repo {{ .EntityName }}Repository
+type ServiceImpl struct {
+    repo Repo
 }
 
-func New{{ .EntityName }}ServiceImpl(repo {{ .EntityName }}Repository) *{{ .EntityName }}ServiceImpl {
-    return &{{ .EntityName }}ServiceImpl{repo: repo}
+func NewServiceImpl(repo Repo) *ServiceImpl {
+    return &ServiceImpl{repo: repo}
 }
 
-func (s *{{ .EntityName }}ServiceImpl) Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error) {
-    // TODO: add business logic to {{ .EntityName }}Service.Create
+func (s *ServiceImpl) Create(entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error) {
+    // TODO: add business logic to Service.Create
     return s.repo.Create(entity)
 }
 
-func (s *{{ .EntityName }}ServiceImpl) Get(id uint64) (*{{ .EntityName }}, error) {
+func (s *ServiceImpl) Get(id uint64) (*models.{{ .EntityName }}, error) {
     entity, err := s.repo.Get(id)
-    // TODO: add business logic to {{ .EntityName }}Service.Get
+    // TODO: add business logic to Service.Get
     return entity, err
 }
 
-func (s *{{ .EntityName }}ServiceImpl) Update(entity *{{ .EntityName }}) error {
-    // TODO: add business logic to {{ .EntityName }}Service.Update
+func (s *ServiceImpl) Update(entity *models.{{ .EntityName }}) error {
+    // TODO: add business logic to Service.Update
     return s.repo.Update(entity)
 }
 
-func (s *{{ .EntityName }}ServiceImpl) Delete(id uint64) error {
-    // TODO: add business logic to {{ .EntityName }}Service.Delete
+func (s *ServiceImpl) Delete(id uint64) error {
+    // TODO: add business logic to Service.Delete
     return s.repo.Delete(id)
 }
 `))
@@ -57,9 +57,11 @@ func (s *{{ .EntityName }}ServiceImpl) Delete(id uint64) error {
 
 func Generate(ent schema.Entity, out io.Writer, entityImport string) {
 	templateData := struct {
+		PackageName  string
 		EntityName   string
 		EntityImport string
 	}{
+		PackageName:  ent.JsonName,
 		EntityName:   ent.Name,
 		EntityImport: entityImport,
 	}
