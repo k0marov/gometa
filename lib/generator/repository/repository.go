@@ -16,37 +16,40 @@ package {{.PackageName}}
 
 import (
     "gorm.io/gorm"
-    . "{{.EntityImport}}"
+	"log"
+    "{{.EntityImport}}"
 )
 
-type {{ .EntityName }}RepositoryImpl struct {
+type RepositoryImpl struct {
     db *gorm.DB
 }
 
-func New{{ .EntityName }}RepositoryImpl(db *gorm.DB) {{ .EntityName }}RepositoryImpl {
-    db.AutoMigrate(&{{.EntityName}}{})
-    return {{ .EntityName }}RepositoryImpl{db: db}
+func NewRepositoryImpl(db *gorm.DB) *RepositoryImpl {
+    if err := db.AutoMigrate(&models.{{.EntityName}}{}); err != nil {
+		log.Fatalf("failed migrating for {{.EntityName}}: %v", err) 
+	}
+    return &RepositoryImpl{db: db}
 }
 
-func (r {{ .EntityName }}RepositoryImpl) Create(entity *{{ .EntityName }}) (*{{.EntityName}}, error) {
+func (r *RepositoryImpl) Create(entity *models.{{ .EntityName }}) (*models.{{.EntityName}}, error) {
     return entity, r.db.Create(entity).Error
 }
 
-func (r {{ .EntityName }}RepositoryImpl) Get(id uint64) (*{{ .EntityName }}, error) {
-    entity := new({{ .EntityName }})
-    err := r.db.Limit(1).Where("id = ?", id).First(entity).Error
+func (r *RepositoryImpl) Get(id uint64) (*models.{{ .EntityName }}, error) {
+    entity := new(models.{{ .EntityName }})
+    err := r.db.Where("id = ?", id).First(entity).Error
 	//if err == gorm.ErrRecordNotFound {
 	//	return nil, client_errors.Err{{.EntityName}}NotFound
 	//}
     return entity, err
 }
 
-func (r {{ .EntityName }}RepositoryImpl) Update(entity *{{ .EntityName }}) error {
+func (r *RepositoryImpl) Update(entity *models.{{ .EntityName }}) error {
     return r.db.Model(entity).Updates(entity).Error
 }
 
-func (r {{ .EntityName }}RepositoryImpl) Delete(id uint64) error {
-    return r.db.Delete(&{{.EntityName}}{}, id).Error
+func (r *RepositoryImpl) Delete(id uint64) error {
+    return r.db.Delete(&models.{{.EntityName}}{}, id).Error
 }
 `))
 
