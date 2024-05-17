@@ -17,7 +17,9 @@ package {{.PackageName}}
 import (
     "gorm.io/gorm"
 	"log"
+	"errors"
     "{{.EntityImport}}"
+	"{{.ModuleName}}/internal/clienterrs"
 )
 
 type RepositoryImpl struct {
@@ -38,9 +40,9 @@ func (r *RepositoryImpl) Create(entity *models.{{ .EntityName }}) (*models.{{.En
 func (r *RepositoryImpl) Get(id uint64) (*models.{{ .EntityName }}, error) {
     entity := new(models.{{ .EntityName }})
     err := r.db.Where("id = ?", id).First(entity).Error
-	//if err == gorm.ErrRecordNotFound {
-	//	return nil, client_errors.Err{{.EntityName}}NotFound
-	//}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, clienterrs.ErrNotFound
+	}
     return entity, err
 }
 
@@ -53,12 +55,16 @@ func (r *RepositoryImpl) Delete(id uint64) error {
 }
 `))
 
-func Generate(ent schema.Entity, out io.Writer, packageName, entityImport string) {
+// TODO: добавить проброску контекста везде
+
+func Generate(ent schema.Entity, out io.Writer, moduleName, packageName, entityImport string) {
 	templateData := struct {
+		ModuleName   string
 		PackageName  string
 		EntityImport string
 		EntityName   string
 	}{
+		ModuleName:   moduleName,
 		PackageName:  packageName,
 		EntityImport: entityImport,
 		EntityName:   ent.Name,

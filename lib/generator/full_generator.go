@@ -56,7 +56,7 @@ func Generate(schemaPath, projectDir string) {
 	//basePackagePath := strings.TrimSuffix(entityImportPath, "/entity")
 
 	repoFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", ent.JsonName, "repository.go"))
-	repository.Generate(ent, repoFile, ent.JsonName, entityImportPath)
+	repository.Generate(ent, repoFile, moduleName, ent.JsonName, entityImportPath)
 
 	serviceFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "services", ent.JsonName, "service.go"))
 	service.Generate(ent, serviceFile, entityImportPath)
