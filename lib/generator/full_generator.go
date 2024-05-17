@@ -31,7 +31,7 @@ func GetGoModuleName(goModContents io.Reader) (string, error) {
 	return firstLine[1], nil
 }
 
-func Generate(schemaPath, projectDir string, withMain bool) {
+func Generate(schemaPath, projectDir string) {
 	goMod, err := os.Open(filepath.Join(projectDir, "go.mod"))
 	if err != nil {
 		log.Fatalf("while opening project go.mod: %v", err)
@@ -63,12 +63,4 @@ func Generate(schemaPath, projectDir string, withMain bool) {
 
 	handlersFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", ent.JsonName, "controller.go"))
 	delivery.GenerateHandlers(ent, handlersFile, moduleName, ent.JsonName, entityImportPath)
-
-	//setupFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "setup.go"))
-	//setup.Generate(ent, setupFile, packageName, basePackagePath)
-
-	//if withMain {
-	//	baseMainFile := helpers.CreateFileRecursively(filepath.Join(filepath.Dir(internalDir), "main.go"))
-	//	base_main.Generate(ent, baseMainFile, basePackagePath)
-	//}
 }
