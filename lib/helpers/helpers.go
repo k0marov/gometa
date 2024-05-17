@@ -1,13 +1,11 @@
 package helpers
 
 import (
-	"bytes"
 	"fmt"
 	"go/format"
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -42,17 +40,4 @@ func WriteFormatted(source []byte, out io.Writer) error {
 		return fmt.Errorf("error when writing formatted code to output file: %w", err)
 	}
 	return nil
-}
-
-func GetGoImportPath(filepath string) string {
-	c := exec.Command("go", "list", filepath)
-	var output bytes.Buffer
-	c.Stdout = &output
-	c.Stderr = &output
-	err := c.Run()
-	if err != nil {
-		log.Fatalf("failed getting package name for %q: %v. Output: %q", filepath, err, output.String())
-	}
-	result := output.String()
-	return result[:len(result)-1] // remove EOF from the end
 }
