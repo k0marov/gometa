@@ -10,7 +10,7 @@ import (
 )
 
 var serviceTemplate = template.Must(template.New("").Parse(`
-package services
+package {{ .PackageName }}
 
 import (
     "{{ .EntityImport }}"
