@@ -16,33 +16,34 @@ import (
     "net/http"
     "strconv"
     "github.com/gin-gonic/gin"
-    . "{{ .EntityImport }}"
+    "{{ .EntityImport }}"
+	//"{{ .ModuleName }}/internal/web/helpers"
 )
 
-type {{ .EntityName }}Service interface {
-    Create(entity *{{ .EntityName }}) (*{{ .EntityName }}, error)
-    Get(id uint64) (*{{ .EntityName }}, error) 
-    Update(entity *{{ .EntityName }}) error 
+type Service interface {
+    Create(entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error)
+    Get(id uint64) (*models.{{ .EntityName }}, error) 
+    Update(entity *models.{{ .EntityName }}) error 
     Delete(id uint64) error 
 }
 
-type {{ .EntityName }}Handlers struct {
-    svc {{ .EntityName }}Service
+type Handlers struct {
+    svc Service
 }
 
-func New{{ .EntityName }}Handlers(svc {{ .EntityName }}Service) *{{ .EntityName }}Handlers {
-    return &{{ .EntityName }}Handlers{svc: svc}
+func New{{ .EntityName }}Handlers(svc Service) *Handlers {
+    return &Handlers{svc: svc}
 }
 
-func (h *{{ .EntityName }}Handlers) DefineRoutes(r gin.IRouter) {
+func (h *Handlers) DefineRoutes(r gin.IRouter) {
     r.POST("/api/v1/{{.PackageName}}s/", h.Create)
 	r.GET("/api/v1/{{.PackageName}}s/:id", h.Get) 
     r.PUT("/api/v1/{{.PackageName}}s/", h.Update) 
 	r.DELETE("/api/v1/{{.PackageName}}s/:id", h.Delete)
 }
 
-func (h *{{ .EntityName }}Handlers) Create(c *gin.Context) { 
-    toCreate := new({{ .EntityName }})
+func (h *Handlers) Create(c *gin.Context) { 
+    toCreate := new(models.{{ .EntityName }})
     if c.BindJSON(toCreate) != nil {
         return 
     }
@@ -54,7 +55,7 @@ func (h *{{ .EntityName }}Handlers) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, created) 
 }
 
-func (h *{{ .EntityName }}Handlers) Get(c *gin.Context) { 
+func (h *Handlers) Get(c *gin.Context) { 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
     if err != nil {
         // TODO: add error
@@ -68,8 +69,8 @@ func (h *{{ .EntityName }}Handlers) Get(c *gin.Context) {
     c.JSON(http.StatusOK, entity)
 }
 
-func (h *{{ .EntityName }}Handlers) Update(c *gin.Context) { 
-    upd := new({{ .EntityName }})
+func (h *Handlers) Update(c *gin.Context) { 
+    upd := new(models.{{ .EntityName }})
     if c.BindJSON(&upd) != nil {
         return 
     }
@@ -81,7 +82,7 @@ func (h *{{ .EntityName }}Handlers) Update(c *gin.Context) {
 	c.Status(http.StatusOK) 
 }
 
-func (h *{{ .EntityName }}Handlers) Delete(c *gin.Context) { 
+func (h *Handlers) Delete(c *gin.Context) { 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
     if err != nil {
         // TODO: add error
@@ -96,12 +97,14 @@ func (h *{{ .EntityName }}Handlers) Delete(c *gin.Context) {
 }
 `))
 
-func GenerateHandlers(ent schema.Entity, out io.Writer, packageName, entityImport string) {
+func GenerateHandlers(ent schema.Entity, out io.Writer, moduleName, packageName, entityImport string) {
 	templateData := struct {
 		PackageName  string
+		ModuleName   string
 		EntityName   string
 		EntityImport string
 	}{
+		ModuleName:   moduleName,
 		PackageName:  packageName,
 		EntityName:   ent.Name,
 		EntityImport: entityImport,

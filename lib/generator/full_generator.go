@@ -62,7 +62,7 @@ func Generate(schemaPath, projectDir string, withMain bool) {
 	service.Generate(ent, serviceFile, entityImportPath)
 
 	handlersFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", ent.JsonName, "controller.go"))
-	delivery.GenerateHandlers(ent, handlersFile, ent.JsonName, entityImportPath)
+	delivery.GenerateHandlers(ent, handlersFile, moduleName, ent.JsonName, entityImportPath)
 
 	//setupFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "setup.go"))
 	//setup.Generate(ent, setupFile, packageName, basePackagePath)
