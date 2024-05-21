@@ -9,6 +9,8 @@ import (
 	"text/template"
 )
 
+// TODO: add mappers
+
 var handlersTemplate = template.Must(template.New("").Parse(`
 package {{.PackageName}}
 
@@ -24,6 +26,7 @@ import (
 type Service interface {
     Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error)
     Get(ctx context.Context, id uint64) (*models.{{ .EntityName }}, error) 
+    GetAll(ctx context.Context) ([]*models.{{ .EntityName }}, error) 
     Update(ctx context.Context, entity *models.{{ .EntityName }}) error 
     Delete(ctx context.Context, id uint64) error 
 }
@@ -39,6 +42,7 @@ func NewHandlers(svc Service) *Handlers {
 func (h *Handlers) DefineRoutes(r gin.IRouter) {
     r.POST("/api/v1/{{.PackageName}}s/", h.Create)
 	r.GET("/api/v1/{{.PackageName}}s/:id", h.Get) 
+	r.GET("/api/v1/{{.PackageName}}s", h.GetAll) 
     r.PUT("/api/v1/{{.PackageName}}s/", h.Update) 
 	r.DELETE("/api/v1/{{.PackageName}}s/:id", h.Delete)
 }
@@ -68,6 +72,15 @@ func (h *Handlers) Get(c *gin.Context) {
         return 
     }
     c.JSON(http.StatusOK, entity)
+}
+
+func (h *Handlers) GetAll(c *gin.Context) { 
+    entities, err := h.svc.GetAll(c.Request.Context())
+    if err != nil {
+		clienterrs.WriteErrorResponse(c.Writer, err) 
+        return 
+    }
+    c.JSON(http.StatusOK, entities)
 }
 
 func (h *Handlers) Update(c *gin.Context) { 
