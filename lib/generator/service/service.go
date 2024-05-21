@@ -20,6 +20,7 @@ import (
 type Repo interface {
     Create(entity *models.{{ .EntityName }}) (*models.{{.EntityName}}, error)
     Get(id uint64) (*models.{{ .EntityName }}, error) 
+    GetAll() ([]*models.{{ .EntityName }}, error) 
     Update(entity *models.{{ .EntityName }}) error 
     Delete(id uint64) error 
 }
@@ -41,6 +42,11 @@ func (s *ServiceImpl) Get(ctx context.Context, id uint64) (*models.{{ .EntityNam
     entity, err := s.repo.Get(id)
     // TODO: add business logic to Service.Get
     return entity, err
+}
+
+func (s *ServiceImpl) GetAll(ctx context.Context) ([]*models.{{ .EntityName }}, error) {
+    // TODO: add business logic 
+    return s.repo.GetAll()
 }
 
 func (s *ServiceImpl) Update(ctx context.Context, entity *models.{{ .EntityName }}) error {
