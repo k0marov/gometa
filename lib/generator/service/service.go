@@ -14,6 +14,7 @@ package {{ .PackageName }}
 
 import (
 	"context"
+	"{{ .ModuleName }}/pkg/logger"
     "{{ .EntityImport }}"
 )
 
@@ -34,27 +35,32 @@ func NewServiceImpl(repo Repo) *ServiceImpl {
 }
 
 func (s *ServiceImpl) Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error) {
+	logger.Debug("creating {{ .EntityName}}", "value", entity) 
     // TODO: add business logic to Service.Create
     return s.repo.Create(entity)
 }
 
 func (s *ServiceImpl) Get(ctx context.Context, id uint64) (*models.{{ .EntityName }}, error) {
+	logger.Debug("getting {{ .EntityName}}", "id", id) 
     entity, err := s.repo.Get(id)
     // TODO: add business logic to Service.Get
     return entity, err
 }
 
 func (s *ServiceImpl) GetAll(ctx context.Context) ([]*models.{{ .EntityName }}, error) {
+	logger.Debug("getting all {{ .EntityName}}s") 
     // TODO: add business logic 
     return s.repo.GetAll()
 }
 
 func (s *ServiceImpl) Update(ctx context.Context, entity *models.{{ .EntityName }}) error {
+	logger.Debug("updating {{.EntityName}}", "value", entity) 
     // TODO: add business logic to Service.Update
     return s.repo.Update(entity)
 }
 
 func (s *ServiceImpl) Delete(ctx context.Context, id uint64) error {
+	logger.Debug("deleting {{.EntityName}}", "id", id) 
     // TODO: add business logic to Service.Delete
     return s.repo.Delete(id)
 }
@@ -62,12 +68,14 @@ func (s *ServiceImpl) Delete(ctx context.Context, id uint64) error {
 
 // TODO: add returning id from Create
 
-func Generate(ent schema.Entity, out io.Writer, entityImport string) {
+func Generate(ent schema.Entity, out io.Writer, moduleName, entityImport string) {
 	templateData := struct {
+		ModuleName   string
 		PackageName  string
 		EntityName   string
 		EntityImport string
 	}{
+		ModuleName:   moduleName,
 		PackageName:  ent.JsonName,
 		EntityName:   ent.Name,
 		EntityImport: entityImport,
