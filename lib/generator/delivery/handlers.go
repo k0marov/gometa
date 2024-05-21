@@ -47,6 +47,16 @@ func (h *Handlers) DefineRoutes(r gin.IRouter) {
 	r.DELETE("/api/v1/{{.PackageName}}s/:id", h.Delete)
 }
 
+// Create godoc 
+// @Summary Create {{ .EntityName }} 
+// @Description Creates a new {{ .EntityName }}, returns an error if it already exists 
+// @ID create-{{.PackageName}}
+// @Tags {{.PackageName}} 
+// @Accept json 
+// @Produce json 
+// @Param {{.EntityName}} body models.{{.EntityName}} true "info about new object"
+// @Success 201 {object} models.{{.EntityName}} 
+// @Router /api/v1/{{.PackageName}}s [post]
 func (h *Handlers) Create(c *gin.Context) { 
     toCreate := new(models.{{ .EntityName }})
     if c.BindJSON(toCreate) != nil {
@@ -60,6 +70,15 @@ func (h *Handlers) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, created) 
 }
 
+// Get godoc 
+// @Summary Get {{ .EntityName }} by id
+// @Description Gets {{ .EntityName }} by id
+// @ID get-{{.PackageName}}-by-id 
+// @Tags {{.PackageName}} 
+// @Accept json 
+// @Produce json 
+// @Success 200 {object} models.{{.EntityName}} 
+// @Router /api/v1/{{.PackageName}}s/:id [get]
 func (h *Handlers) Get(c *gin.Context) { 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
     if err != nil {
@@ -74,6 +93,15 @@ func (h *Handlers) Get(c *gin.Context) {
     c.JSON(http.StatusOK, entity)
 }
 
+// GetAll godoc 
+// @Summary Get all {{ .EntityName }}s
+// @Description Gets all {{ .EntityName }} saved in db
+// @ID get-all-{{.PackageName}}
+// @Tags {{.PackageName}} 
+// @Accept json 
+// @Produce json 
+// @Success 200 {object} []models.{{.EntityName}} 
+// @Router /api/v1/{{.PackageName}}s [get]
 func (h *Handlers) GetAll(c *gin.Context) { 
     entities, err := h.svc.GetAll(c.Request.Context())
     if err != nil {
@@ -83,6 +111,16 @@ func (h *Handlers) GetAll(c *gin.Context) {
     c.JSON(http.StatusOK, entities)
 }
 
+// Update godoc 
+// @Summary Update {{ .EntityName }} 
+// @Description Updates {{ .EntityName }}, returns an error if it does not exist
+// @ID update-{{.PackageName}}
+// @Tags {{.PackageName}} 
+// @Accept json 
+// @Produce json 
+// @Param upd body models.{{.EntityName}} true "info about updating"
+// @Success 200 
+// @Router /api/v1/{{.PackageName}}s [put]
 func (h *Handlers) Update(c *gin.Context) { 
     upd := new(models.{{ .EntityName }})
     if c.BindJSON(&upd) != nil {
@@ -96,6 +134,15 @@ func (h *Handlers) Update(c *gin.Context) {
 	c.Status(http.StatusOK) 
 }
 
+// Delete godoc 
+// @Summary Delete {{ .EntityName }} 
+// @Description Deletes {{ .EntityName }}, returns an error if it does not exist
+// @ID delete-{{.PackageName}}
+// @Tags {{.PackageName}}
+// @Accept json 
+// @Produce json 
+// @Success 204 
+// @Router /api/v1/{{.PackageName}}s/:id [delete]
 func (h *Handlers) Delete(c *gin.Context) { 
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
     if err != nil {
