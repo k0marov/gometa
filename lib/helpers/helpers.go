@@ -2,11 +2,14 @@ package helpers
 
 import (
 	"fmt"
+	"go/ast"
 	"go/format"
+	"go/token"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -40,4 +43,24 @@ func WriteFormatted(source []byte, out io.Writer) error {
 		return fmt.Errorf("error when writing formatted code to output file: %w", err)
 	}
 	return nil
+}
+
+func AddImport(f *ast.File, importPath string) {
+	for i := 0; i < len(f.Decls); i++ {
+		d := f.Decls[i]
+
+		switch d.(type) {
+		case *ast.FuncDecl:
+			// No action
+		case *ast.GenDecl:
+			dd := d.(*ast.GenDecl)
+
+			// IMPORT Declarations
+			if dd.Tok == token.IMPORT {
+				// Add the new import
+				iSpec := &ast.ImportSpec{Path: &ast.BasicLit{Value: strconv.Quote(importPath)}}
+				dd.Specs = append(dd.Specs, iSpec)
+			}
+		}
+	}
 }

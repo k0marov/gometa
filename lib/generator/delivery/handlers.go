@@ -35,7 +35,7 @@ type Handlers struct {
     svc Service
 }
 
-func NewHandlers(svc Service) *Handlers {
+func NewController(svc Service) *Handlers {
     return &Handlers{svc: svc}
 }
 
