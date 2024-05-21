@@ -16,15 +16,16 @@ import (
     "net/http"
     "strconv"
     "github.com/gin-gonic/gin"
+	"context"
     "{{ .EntityImport }}"
-	//"{{ .ModuleName }}/internal/clienterrs"
+	"{{ .ModuleName }}/internal/clienterrs"
 )
 
 type Service interface {
-    Create(entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error)
-    Get(id uint64) (*models.{{ .EntityName }}, error) 
-    Update(entity *models.{{ .EntityName }}) error 
-    Delete(id uint64) error 
+    Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error)
+    Get(ctx context.Context, id uint64) (*models.{{ .EntityName }}, error) 
+    Update(ctx context.Context, entity *models.{{ .EntityName }}) error 
+    Delete(ctx context.Context, id uint64) error 
 }
 
 type Handlers struct {
@@ -47,7 +48,7 @@ func (h *Handlers) Create(c *gin.Context) {
     if c.BindJSON(toCreate) != nil {
         return 
     }
-    created, err := h.svc.Create(toCreate)
+    created, err := h.svc.Create(c.Request.Context(), toCreate)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
@@ -61,7 +62,7 @@ func (h *Handlers) Get(c *gin.Context) {
 		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrIDNotInt) 
         return 
     }
-    entity, err := h.svc.Get(id)
+    entity, err := h.svc.Get(c.Request.Context(), id)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
@@ -74,7 +75,7 @@ func (h *Handlers) Update(c *gin.Context) {
     if c.BindJSON(&upd) != nil {
         return 
     }
-    err := h.svc.Update(upd)
+    err := h.svc.Update(c.Request.Context(), upd)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
@@ -88,7 +89,7 @@ func (h *Handlers) Delete(c *gin.Context) {
 		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrIDNotInt) 
         return 
     }
-    err = h.svc.Delete(id)
+    err = h.svc.Delete(c.Request.Context(), id)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 

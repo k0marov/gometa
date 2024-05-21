@@ -13,6 +13,7 @@ var serviceTemplate = template.Must(template.New("").Parse(`
 package {{ .PackageName }}
 
 import (
+	"context"
     "{{ .EntityImport }}"
 )
 
@@ -31,23 +32,23 @@ func NewServiceImpl(repo Repo) *ServiceImpl {
     return &ServiceImpl{repo: repo}
 }
 
-func (s *ServiceImpl) Create(entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error) {
     // TODO: add business logic to Service.Create
     return s.repo.Create(entity)
 }
 
-func (s *ServiceImpl) Get(id uint64) (*models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) Get(ctx context.Context, id uint64) (*models.{{ .EntityName }}, error) {
     entity, err := s.repo.Get(id)
     // TODO: add business logic to Service.Get
     return entity, err
 }
 
-func (s *ServiceImpl) Update(entity *models.{{ .EntityName }}) error {
+func (s *ServiceImpl) Update(ctx context.Context, entity *models.{{ .EntityName }}) error {
     // TODO: add business logic to Service.Update
     return s.repo.Update(entity)
 }
 
-func (s *ServiceImpl) Delete(id uint64) error {
+func (s *ServiceImpl) Delete(ctx context.Context, id uint64) error {
     // TODO: add business logic to Service.Delete
     return s.repo.Delete(id)
 }
