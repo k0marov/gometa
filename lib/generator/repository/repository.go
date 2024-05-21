@@ -10,13 +10,13 @@ import (
 )
 
 // TODO: add logs and error wraps in repo template
-// TODO: add creating SQL table in repo
 var repoTemplate = template.Must(template.New("").Parse(`
 package {{.PackageName}} 
 
 import (
     "gorm.io/gorm"
 	"log"
+	"fmt"
 	"errors"
     "{{.EntityImport}}"
 	"{{.ModuleName}}/internal/clienterrs"
@@ -44,6 +44,14 @@ func (r *RepositoryImpl) Get(id uint64) (*models.{{ .EntityName }}, error) {
 		return nil, clienterrs.ErrNotFound
 	}
     return entity, err
+}
+
+func (r *RepositoryImpl) GetAll() ([]*models.{{ .EntityName }}, error) {
+	var entities []*models.{{ .EntityName }} 
+	if err := r.db.Find(entities).Error; err != nil {
+		return nil, fmt.Errorf("getting all rows from sql: %w", err) 	
+	}
+	return entities, nil
 }
 
 func (r *RepositoryImpl) Update(entity *models.{{ .EntityName }}) error {
