@@ -6,6 +6,7 @@ import (
 	"github.com/k0marov/gometa/lib/generator/entity_struct"
 	"github.com/k0marov/gometa/lib/generator/repository"
 	"github.com/k0marov/gometa/lib/generator/service"
+	"github.com/k0marov/gometa/lib/generator/setup"
 	"github.com/k0marov/gometa/lib/helpers"
 	"github.com/k0marov/gometa/lib/schema"
 	"io"
@@ -64,5 +65,5 @@ func Generate(schemaPath, projectDir string) {
 	handlersFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", ent.JsonName, "controller.go"))
 	delivery.GenerateHandlers(ent, handlersFile, moduleName, ent.JsonName, entityImportPath)
 
-	//setup.AddToApplication(ent, projectDir, moduleName)
+	setup.AddToApplication(ent, projectDir, moduleName)
 }

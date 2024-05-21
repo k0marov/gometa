@@ -45,7 +45,7 @@ func WriteFormatted(source []byte, out io.Writer) error {
 	return nil
 }
 
-func AddImport(f *ast.File, importPath string) {
+func AddImport(f *ast.File, importPath, alias string) {
 	for i := 0; i < len(f.Decls); i++ {
 		d := f.Decls[i]
 
@@ -59,6 +59,9 @@ func AddImport(f *ast.File, importPath string) {
 			if dd.Tok == token.IMPORT {
 				// Add the new import
 				iSpec := &ast.ImportSpec{Path: &ast.BasicLit{Value: strconv.Quote(importPath)}}
+				if alias != "" {
+					iSpec.Name = &ast.Ident{Name: alias}
+				}
 				dd.Specs = append(dd.Specs, iSpec)
 			}
 		}

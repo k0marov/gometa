@@ -20,7 +20,7 @@ func modifyContainer(ent schema.Entity, moduleName, containerPath string) {
 		log.Fatalf("parsing container.go: %v", err)
 	}
 	serviceImport := filepath.Join(moduleName, "internal", "services", ent.JsonName)
-	helpers.AddImport(f, serviceImport)
+	helpers.AddImport(f, serviceImport, "")
 	astutil.Apply(f, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
 		typeSpec, ok := n.(*ast.TypeSpec)
@@ -60,7 +60,7 @@ func modifyRouter(ent schema.Entity, moduleName, routerPath string) {
 		log.Fatalf("parsing router.go: %v", err)
 	}
 	controllerImport := filepath.Join(moduleName, "internal", "web", "controllers", "apiv1", ent.JsonName)
-	helpers.AddImport(f, controllerImport)
+	helpers.AddImport(f, controllerImport, "")
 	astutil.Apply(f, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
 		funcDecl, ok := n.(*ast.FuncDecl)
@@ -112,7 +112,62 @@ func modifyRouter(ent schema.Entity, moduleName, routerPath string) {
 	}
 }
 
+func modifyApplication(ent schema.Entity, moduleName, applicationPath string) {
+	fset := token.NewFileSet()
+	f, err := parser.ParseFile(fset, applicationPath, nil, parser.ParseComments)
+	if err != nil {
+		log.Fatalf("parsing application.go: %v", err)
+	}
+	serviceImport := filepath.Join(moduleName, "internal", "services", ent.JsonName)
+	helpers.AddImport(f, serviceImport, "")
+	repoImport := filepath.Join(moduleName, "internal", "repository", ent.JsonName)
+	repoImportAlias := "repo" + ent.JsonName
+	helpers.AddImport(f, repoImport, repoImportAlias)
+
+	astutil.Apply(f, nil, func(c *astutil.Cursor) bool {
+		n := c.Node()
+		containerLit, ok := n.(*ast.CompositeLit)
+		if !ok {
+			return true
+		}
+		containerLitType, ok := containerLit.Type.(*ast.SelectorExpr)
+		if !ok {
+			return true
+		}
+		if containerLitType.Sel.Name != "Container" {
+			return true
+		}
+		// TODO: add line break before new service
+		containerLit.Elts = append(containerLit.Elts, &ast.KeyValueExpr{
+			Key: &ast.Ident{Name: ent.Name + "Service"},
+			Value: &ast.CallExpr{
+				Fun: &ast.SelectorExpr{
+					X:   &ast.Ident{Name: ent.JsonName},
+					Sel: &ast.Ident{Name: "NewServiceImpl"},
+				},
+				Args: []ast.Expr{&ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X:   &ast.Ident{Name: repoImportAlias},
+						Sel: &ast.Ident{Name: "NewRepositoryImpl"},
+					},
+					Args: []ast.Expr{&ast.Ident{Name: "db"}},
+				}},
+			},
+		})
+		return false
+	})
+	applicationF, err := os.OpenFile(applicationPath, os.O_WRONLY, 0644)
+	defer applicationF.Close()
+	if err != nil {
+		log.Fatalf("opening application file: %v", err)
+	}
+	if err := format.Node(applicationF, fset, f); err != nil {
+		log.Fatalf("writing updated application file: %v", err)
+	}
+}
+
 func AddToApplication(ent schema.Entity, projectDir string, moduleName string) {
 	modifyContainer(ent, moduleName, filepath.Join(projectDir, "internal", "app", "dependencies", "container.go"))
 	modifyRouter(ent, moduleName, filepath.Join(projectDir, "internal", "app", "initializers", "router.go"))
+	modifyApplication(ent, moduleName, filepath.Join(projectDir, "internal", "app", "application.go"))
 }
