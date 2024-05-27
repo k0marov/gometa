@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"fmt"
 	"log"
 	"reflect"
 )
@@ -66,4 +67,13 @@ func (t FieldType) GolangType() string {
 	}
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"
+}
+
+func (f Field) GetGoTags() string {
+	tags := fmt.Sprintf("`json:\"%s\"", f.JsonName)
+	if f.JsonName == PrimaryKeyName && f.Type == String {
+		tags += " gorm:\"type:uuid;default:uuid_generate_v4()\""
+	}
+	tags += "`"
+	return tags
 }

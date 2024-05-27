@@ -2,6 +2,7 @@ package schema
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/k0marov/gometa/lib/helpers"
 	"log"
 	"os"
@@ -12,7 +13,7 @@ import (
 
 const PrimaryKeyName = "id"
 
-func Parse(filePath string) Entity {
+func Parse(filePath string) (Entity, error) {
 	jsonEntity := parseJsonFile(filePath)
 
 	_, fileName := filepath.Split(filePath)
@@ -30,10 +31,13 @@ func Parse(filePath string) Entity {
 			Type:     fieldTypeFromInterface(exampleValue),
 		}
 		if field.JsonName == PrimaryKeyName {
-			hasPrimaryKey = true
 			field.GoName = "ID" // convention of gorm
-			field.Type = Uint64
-			log.Printf("Changed %q field to %q with type %q because it's a convention of gorm", field.JsonName, "ID", field.Type)
+			if field.Type == Int {
+				field.Type = Uint64
+			} else if field.Type != String {
+				return Entity{}, fmt.Errorf("got primary key type %q, but only int and string are supported", field.Type)
+			}
+			hasPrimaryKey = true
 		}
 		ent.Fields = append(ent.Fields, field)
 		sort.Slice(ent.Fields, func(i, j int) bool {
@@ -42,10 +46,10 @@ func Parse(filePath string) Entity {
 	}
 
 	if !hasPrimaryKey {
-		log.Fatalf("entity at %q does not have a primary key. Please add %q field", filePath, PrimaryKeyName)
+		return Entity{}, fmt.Errorf("entity at %q does not have a primary key. Please add %q field", filePath, PrimaryKeyName)
 	}
 
-	return ent
+	return ent, nil
 }
 
 func parseJsonFile(filePath string) map[string]any {

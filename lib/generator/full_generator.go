@@ -45,7 +45,10 @@ func Generate(schemaPath, projectDir string) {
 
 	schemaPath, _ = filepath.Abs(schemaPath)
 
-	ent := schema.Parse(schemaPath)
+	ent, err := schema.Parse(schemaPath)
+	if err != nil {
+		log.Fatalf("failed parsing schema: %v", err)
+	}
 	internalDir := filepath.Join(projectDir, "internal")
 
 	entityFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "models", fmt.Sprintf("%s.go", ent.JsonName)))
