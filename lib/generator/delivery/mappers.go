@@ -17,6 +17,13 @@ import (
     "{{.EntityImport}}"
 )
 
+type Create{{ .Entity.Name }}Req struct {
+	{{ range $field := .Entity.Fields }} 
+		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
+		{{ $field.GoName }} {{ $field.Type.GolangType }} {{ $field.GetJsonTags }} 
+	{{ end }}
+}
+
 type {{ .Entity.Name }} struct {
 	{{ range $field := .Entity.Fields }} 
 	{{ $field.GoName }} {{ $field.Type.GolangType }} {{ $field.GetJsonTags }} {{ end }}
@@ -35,9 +42,17 @@ func MapEntity(e models.{{ .Entity.Name }}) {{ .Entity.Name }} {
 		{{ $field.GoName }}: e.{{ $field.GoName }}, {{ end }}
 	}
 }
+
+func (c Create{{.Entity.Name}}Req) ToDTO() models.Create{{.Entity.Name}}DTO {
+	return models.Create{{.Entity.Name}}DTO{
+		{{ range $field := .Entity.Fields }} 
+			{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
+			{{ $field.GoName }}: c.{{ $field.GoName }},
+		{{ end }}
+	}
+}
 `))
 
-// TODO: do not accept id for Create
 // TODO: remove unneeded newline after models.{
 
 func GenerateMappers(out io.Writer, ent schema.Entity, genCtx gen.GenerationContext) error {

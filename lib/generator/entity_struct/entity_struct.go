@@ -16,6 +16,13 @@ type {{ .Entity.Name }} struct {
 	{{ range $field := .Entity.Fields }} 
 	{{ $field.GoName }} {{ $field.Type.GolangType }} {{ end }}
 }
+
+type Create{{ .Entity.Name }}DTO struct {
+	{{ range $field := .Entity.Fields }} 
+		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
+		{{ $field.GoName }} {{ $field.Type.GolangType }} 
+	{{ end }}
+}
 `))
 
 func Generate(out io.Writer, ent schema.Entity, packageName string) error {

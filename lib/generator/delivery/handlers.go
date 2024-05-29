@@ -9,8 +9,6 @@ import (
 	"text/template"
 )
 
-// TODO: add mappers
-
 var handlersTemplate = template.Must(template.New("").Parse(`
 package {{.PackageName}}
 
@@ -23,7 +21,7 @@ import (
 )
 
 type Service interface {
-    Create(ctx context.Context, entity models.{{ .EntityName }}) (models.{{ .EntityName }}, error)
+    Create(ctx context.Context, dto models.Create{{ .EntityName }}DTO) (models.{{ .EntityName }}, error)
     Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) 
     GetAll(ctx context.Context) ([]models.{{ .EntityName }}, error) 
     Update(ctx context.Context, entity models.{{ .EntityName }}) error 
@@ -53,15 +51,15 @@ func (h *Handlers) DefineRoutes(r gin.IRouter) {
 // @Tags {{.PackageName}} 
 // @Accept json 
 // @Produce json 
-// @Param {{.EntityName}} body {{.EntityName}} true "info about new object"
+// @Param {{.EntityName}} body Create{{.EntityName}}Req true "info about new object"
 // @Success 201 {object} {{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s [post]
 func (h *Handlers) Create(c *gin.Context) { 
-    toCreate := new({{ .EntityName }})
+    toCreate := new(Create{{ .EntityName }}Req)
     if c.BindJSON(toCreate) != nil {
         return 
     }
-    created, err := h.svc.Create(c.Request.Context(), toCreate.ToEntity())
+    created, err := h.svc.Create(c.Request.Context(), toCreate.ToDTO())
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 

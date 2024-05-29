@@ -68,8 +68,12 @@ func (t FieldType) GolangType() string {
 	return "UNKNOWN"
 }
 
+func (f Field) IsPrimaryKey() bool {
+	return f.JsonName == PrimaryKeyName
+}
+
 func (f Field) GetGormTags() string {
-	if f.JsonName == PrimaryKeyName && f.Type == String {
+	if f.IsPrimaryKey() && f.Type == String {
 		return "`gorm:\"type:uuid;default:uuid_generate_v4()\"`"
 	}
 	return ""
