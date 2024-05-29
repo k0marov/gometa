@@ -37,7 +37,7 @@ func (r *RepositoryImpl) Create(entity *models.{{ .EntityName }}) (*models.{{.En
     return entity, r.db.Create(entity).Error
 }
 
-func (r *RepositoryImpl) Get(id uint64) (*models.{{ .EntityName }}, error) {
+func (r *RepositoryImpl) Get(id string) (*models.{{ .EntityName }}, error) {
     entity := new(models.{{ .EntityName }})
     err := r.db.Where("id = ?", id).First(entity).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -58,7 +58,7 @@ func (r *RepositoryImpl) Update(entity *models.{{ .EntityName }}) error {
     return r.db.Model(entity).Updates(entity).Error
 }
 
-func (r *RepositoryImpl) Delete(id uint64) error {
+func (r *RepositoryImpl) Delete(id string) error {
     return r.db.Delete(&models.{{.EntityName}}{}, id).Error
 }
 `))

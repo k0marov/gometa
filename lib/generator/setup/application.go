@@ -18,7 +18,7 @@ func addToApplication(goPackageName, entityName, moduleName, applicationPath str
 	if err != nil {
 		return fmt.Errorf("parsing application.go: %w", err)
 	}
-	serviceImport := filepath.Join(goPackageName, "internal", "services", goPackageName)
+	serviceImport := filepath.Join(moduleName, "internal", "services", goPackageName)
 	helpers.AddImport(f, serviceImport, "")
 	repoImport := filepath.Join(moduleName, "internal", "repository", goPackageName)
 	repoImportAlias := "repo" + goPackageName

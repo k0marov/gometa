@@ -16,7 +16,6 @@ package {{.PackageName}}
 
 import (
     "net/http"
-    "strconv"
     "github.com/gin-gonic/gin"
 	"context"
     "{{ .EntityImport }}"
@@ -25,10 +24,10 @@ import (
 
 type Service interface {
     Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error)
-    Get(ctx context.Context, id uint64) (*models.{{ .EntityName }}, error) 
+    Get(ctx context.Context, id string) (*models.{{ .EntityName }}, error) 
     GetAll(ctx context.Context) ([]*models.{{ .EntityName }}, error) 
     Update(ctx context.Context, entity *models.{{ .EntityName }}) error 
-    Delete(ctx context.Context, id uint64) error 
+    Delete(ctx context.Context, id string) error 
 }
 
 type Handlers struct {
@@ -80,11 +79,7 @@ func (h *Handlers) Create(c *gin.Context) {
 // @Success 200 {object} models.{{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s/:id [get]
 func (h *Handlers) Get(c *gin.Context) { 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-    if err != nil {
-		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrIDNotInt) 
-        return 
-    }
+	id := c.Param("id")
     entity, err := h.svc.Get(c.Request.Context(), id)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
@@ -144,12 +139,8 @@ func (h *Handlers) Update(c *gin.Context) {
 // @Success 204 
 // @Router /api/v1/{{.PackageName}}s/:id [delete]
 func (h *Handlers) Delete(c *gin.Context) { 
-	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
-    if err != nil {
-		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrIDNotInt) 
-        return 
-    }
-    err = h.svc.Delete(c.Request.Context(), id)
+	id := c.Param("id")
+    err := h.svc.Delete(c.Request.Context(), id)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 

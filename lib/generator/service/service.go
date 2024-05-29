@@ -20,10 +20,10 @@ import (
 
 type Repo interface {
     Create(entity *models.{{ .EntityName }}) (*models.{{.EntityName}}, error)
-    Get(id uint64) (*models.{{ .EntityName }}, error) 
+    Get(id string) (*models.{{ .EntityName }}, error) 
     GetAll() ([]*models.{{ .EntityName }}, error) 
     Update(entity *models.{{ .EntityName }}) error 
-    Delete(id uint64) error 
+    Delete(id string) error 
 }
 
 type ServiceImpl struct {
@@ -40,7 +40,7 @@ func (s *ServiceImpl) Create(ctx context.Context, entity *models.{{ .EntityName 
     return s.repo.Create(entity)
 }
 
-func (s *ServiceImpl) Get(ctx context.Context, id uint64) (*models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) Get(ctx context.Context, id string) (*models.{{ .EntityName }}, error) {
 	logger.Debug("getting {{ .EntityName}}", "id", id) 
     entity, err := s.repo.Get(id)
     // TODO: add business logic to Service.Get
@@ -59,7 +59,7 @@ func (s *ServiceImpl) Update(ctx context.Context, entity *models.{{ .EntityName 
     return s.repo.Update(entity)
 }
 
-func (s *ServiceImpl) Delete(ctx context.Context, id uint64) error {
+func (s *ServiceImpl) Delete(ctx context.Context, id string) error {
 	logger.Debug("deleting {{.EntityName}}", "id", id) 
     // TODO: add business logic to Service.Delete
     return s.repo.Delete(id)
