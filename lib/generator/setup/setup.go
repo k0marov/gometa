@@ -3,7 +3,6 @@ package setup
 import (
 	"fmt"
 	"github.com/k0marov/gometa/lib/helpers"
-	"github.com/k0marov/gometa/lib/schema"
 	"go/ast"
 	"go/format"
 	"go/parser"
@@ -13,13 +12,13 @@ import (
 	"path/filepath"
 )
 
-func modifyContainer(ent schema.Entity, moduleName, containerPath string) error {
+func modifyContainer(goPackageName, entityName, moduleName, containerPath string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, containerPath, nil, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parsing container.go: %w", err)
 	}
-	serviceImport := filepath.Join(moduleName, "internal", "services", ent.JsonName)
+	serviceImport := filepath.Join(moduleName, "internal", "services", goPackageName)
 	helpers.AddImport(f, serviceImport, "")
 	astutil.Apply(f, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
@@ -36,8 +35,8 @@ func modifyContainer(ent schema.Entity, moduleName, containerPath string) error 
 		}
 		structType.Fields.List = append(structType.Fields.List, &ast.Field{
 			Doc:     nil,
-			Names:   []*ast.Ident{{Name: ent.Name + "Service"}},
-			Type:    &ast.StarExpr{X: &ast.SelectorExpr{X: &ast.Ident{Name: ent.JsonName}, Sel: &ast.Ident{Name: "ServiceImpl"}}},
+			Names:   []*ast.Ident{{Name: entityName + "Service"}},
+			Type:    &ast.StarExpr{X: &ast.SelectorExpr{X: &ast.Ident{Name: goPackageName}, Sel: &ast.Ident{Name: "ServiceImpl"}}},
 			Tag:     nil,
 			Comment: nil,
 		})
@@ -54,13 +53,13 @@ func modifyContainer(ent schema.Entity, moduleName, containerPath string) error 
 	return nil
 }
 
-func modifyRouter(ent schema.Entity, moduleName, routerPath string) error {
+func modifyRouter(goPackageName, entityName, moduleName, routerPath string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, routerPath, nil, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parsing router.go: %w", err)
 	}
-	controllerImport := filepath.Join(moduleName, "internal", "web", "controllers", "apiv1", ent.JsonName)
+	controllerImport := filepath.Join(moduleName, "internal", "web", "controllers", "apiv1", goPackageName)
 	helpers.AddImport(f, controllerImport, "")
 	astutil.Apply(f, nil, func(c *astutil.Cursor) bool {
 		n := c.Node()
@@ -91,12 +90,12 @@ func modifyRouter(ent schema.Entity, moduleName, routerPath string) error {
 			}
 			compLit.Elts = append(compLit.Elts, &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.Ident{Name: ent.JsonName},
+					X:   &ast.Ident{Name: goPackageName},
 					Sel: &ast.Ident{Name: "NewController"},
 				},
 				Args: []ast.Expr{&ast.SelectorExpr{
 					X:   &ast.Ident{Name: "container"},
-					Sel: &ast.Ident{Name: ent.Name + "Service"},
+					Sel: &ast.Ident{Name: entityName + "Service"},
 				}},
 			})
 			return false
@@ -114,16 +113,16 @@ func modifyRouter(ent schema.Entity, moduleName, routerPath string) error {
 	return nil
 }
 
-func modifyApplication(ent schema.Entity, moduleName, applicationPath string) error {
+func modifyApplication(goPackageName, entityName, moduleName, applicationPath string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, applicationPath, nil, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parsing application.go: %w", err)
 	}
-	serviceImport := filepath.Join(moduleName, "internal", "services", ent.JsonName)
+	serviceImport := filepath.Join(goPackageName, "internal", "services", goPackageName)
 	helpers.AddImport(f, serviceImport, "")
-	repoImport := filepath.Join(moduleName, "internal", "repository", ent.JsonName)
-	repoImportAlias := "repo" + ent.JsonName
+	repoImport := filepath.Join(moduleName, "internal", "repository", goPackageName)
+	repoImportAlias := "repo" + goPackageName
 	helpers.AddImport(f, repoImport, repoImportAlias)
 
 	astutil.Apply(f, nil, func(c *astutil.Cursor) bool {
@@ -141,10 +140,10 @@ func modifyApplication(ent schema.Entity, moduleName, applicationPath string) er
 		}
 		// TODO: add line break before new service
 		containerLit.Elts = append(containerLit.Elts, &ast.KeyValueExpr{
-			Key: &ast.Ident{Name: ent.Name + "Service"},
+			Key: &ast.Ident{Name: entityName + "Service"},
 			Value: &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
-					X:   &ast.Ident{Name: ent.JsonName},
+					X:   &ast.Ident{Name: goPackageName},
 					Sel: &ast.Ident{Name: "NewServiceImpl"},
 				},
 				Args: []ast.Expr{&ast.CallExpr{
@@ -169,14 +168,14 @@ func modifyApplication(ent schema.Entity, moduleName, applicationPath string) er
 	return nil
 }
 
-func AddToApplication(ent schema.Entity, projectDir string, moduleName string) error {
-	if err := modifyContainer(ent, moduleName, filepath.Join(projectDir, "internal", "app", "dependencies", "container.go")); err != nil {
+func AddToApplication(goPackageName, entityName, projectDir string, moduleName string) error {
+	if err := modifyContainer(goPackageName, entityName, moduleName, filepath.Join(projectDir, "internal", "app", "dependencies", "container.go")); err != nil {
 		return fmt.Errorf("while adding new entity service to container: %w", err)
 	}
-	if err := modifyRouter(ent, moduleName, filepath.Join(projectDir, "internal", "app", "initializers", "router.go")); err != nil {
+	if err := modifyRouter(goPackageName, entityName, moduleName, filepath.Join(projectDir, "internal", "app", "initializers", "router.go")); err != nil {
 		return fmt.Errorf("while adding new entity controller to router: %w", err)
 	}
-	if err := modifyApplication(ent, moduleName, filepath.Join(projectDir, "internal", "app", "application.go")); err != nil {
+	if err := modifyApplication(goPackageName, entityName, moduleName, filepath.Join(projectDir, "internal", "app", "application.go")); err != nil {
 		return fmt.Errorf("while adding new entity to application: %w", err)
 	}
 	return nil
