@@ -76,3 +76,10 @@ func (f Field) GetGoTags() string {
 	tags += "`"
 	return tags
 }
+
+func (f Field) GetGormTags() string {
+	if f.JsonName == PrimaryKeyName && f.Type == String {
+		return "`gorm:\"type:uuid;default:uuid_generate_v4()\"`"
+	}
+	return ""
+}

@@ -52,6 +52,13 @@ func Generate(schemaPath, projectDir string) error {
 	}
 	goPackageName := ent.JsonName
 
+	repoModelsFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", goPackageName, "models.go"))
+	if err != nil {
+		return err
+	}
+	if err := repository.GenerateModel(repoModelsFile, ent, baseGenCtx.WithPackageName(goPackageName)); err != nil {
+		return fmt.Errorf("generating repo models.go file: %w", err)
+	}
 	repoFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", goPackageName, "repository.go"))
 	if err != nil {
 		return err
