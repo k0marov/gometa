@@ -6,7 +6,6 @@ import (
 	"go/format"
 	"go/token"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -21,16 +20,16 @@ func JsonNameToPascalCase(jsonName string) string {
 	return camelCased
 }
 
-func CreateFileRecursively(path string) (file *os.File) {
-	err := os.MkdirAll(filepath.Dir(path), 0777)
+func CreateFileRecursively(path string) (file *os.File, err error) {
+	err = os.MkdirAll(filepath.Dir(path), 0777)
 	if err != nil {
-		log.Fatalf("failed creating directory to put generated file in: %v", err)
+		return nil, fmt.Errorf("failed creating directory to put generated file in: %w", err)
 	}
 	file, err = os.Create(path)
 	if err != nil {
-		log.Fatalf("failed creating file for putting generated code in: %v", err)
+		return nil, fmt.Errorf("failed creating file for putting generated code in: %w", err)
 	}
-	return file
+	return file, nil
 }
 
 func WriteFormatted(source []byte, out io.Writer) error {

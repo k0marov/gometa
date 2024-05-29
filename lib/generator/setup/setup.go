@@ -1,6 +1,7 @@
 package setup
 
 import (
+	"fmt"
 	"github.com/k0marov/gometa/lib/helpers"
 	"github.com/k0marov/gometa/lib/schema"
 	"go/ast"
@@ -8,16 +9,15 @@ import (
 	"go/parser"
 	"go/token"
 	"golang.org/x/tools/go/ast/astutil"
-	"log"
 	"os"
 	"path/filepath"
 )
 
-func modifyContainer(ent schema.Entity, moduleName, containerPath string) {
+func modifyContainer(ent schema.Entity, moduleName, containerPath string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, containerPath, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatalf("parsing container.go: %v", err)
+		return fmt.Errorf("parsing container.go: %w", err)
 	}
 	serviceImport := filepath.Join(moduleName, "internal", "services", ent.JsonName)
 	helpers.AddImport(f, serviceImport, "")
@@ -46,18 +46,19 @@ func modifyContainer(ent schema.Entity, moduleName, containerPath string) {
 	containerF, err := os.OpenFile(containerPath, os.O_WRONLY, 0644)
 	defer containerF.Close()
 	if err != nil {
-		log.Fatalf("opening container file: %v", err)
+		return fmt.Errorf("opening container file: %w", err)
 	}
 	if err := format.Node(containerF, fset, f); err != nil {
-		log.Fatalf("writing updated container file: %v", err)
+		return fmt.Errorf("writing updated container file: %w", err)
 	}
+	return nil
 }
 
-func modifyRouter(ent schema.Entity, moduleName, routerPath string) {
+func modifyRouter(ent schema.Entity, moduleName, routerPath string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, routerPath, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatalf("parsing router.go: %v", err)
+		return fmt.Errorf("parsing router.go: %w", err)
 	}
 	controllerImport := filepath.Join(moduleName, "internal", "web", "controllers", "apiv1", ent.JsonName)
 	helpers.AddImport(f, controllerImport, "")
@@ -105,18 +106,19 @@ func modifyRouter(ent schema.Entity, moduleName, routerPath string) {
 	containerF, err := os.OpenFile(routerPath, os.O_WRONLY, 0644)
 	defer containerF.Close()
 	if err != nil {
-		log.Fatalf("opening router file: %v", err)
+		return fmt.Errorf("opening router file: %w", err)
 	}
 	if err := format.Node(containerF, fset, f); err != nil {
-		log.Fatalf("writing updated router file: %v", err)
+		return fmt.Errorf("writing updated router file: %w", err)
 	}
+	return nil
 }
 
-func modifyApplication(ent schema.Entity, moduleName, applicationPath string) {
+func modifyApplication(ent schema.Entity, moduleName, applicationPath string) error {
 	fset := token.NewFileSet()
 	f, err := parser.ParseFile(fset, applicationPath, nil, parser.ParseComments)
 	if err != nil {
-		log.Fatalf("parsing application.go: %v", err)
+		return fmt.Errorf("parsing application.go: %w", err)
 	}
 	serviceImport := filepath.Join(moduleName, "internal", "services", ent.JsonName)
 	helpers.AddImport(f, serviceImport, "")
@@ -159,15 +161,23 @@ func modifyApplication(ent schema.Entity, moduleName, applicationPath string) {
 	applicationF, err := os.OpenFile(applicationPath, os.O_WRONLY, 0644)
 	defer applicationF.Close()
 	if err != nil {
-		log.Fatalf("opening application file: %v", err)
+		return fmt.Errorf("opening application file: %w", err)
 	}
 	if err := format.Node(applicationF, fset, f); err != nil {
-		log.Fatalf("writing updated application file: %v", err)
+		return fmt.Errorf("writing updated application file: %w", err)
 	}
+	return nil
 }
 
-func AddToApplication(ent schema.Entity, projectDir string, moduleName string) {
-	modifyContainer(ent, moduleName, filepath.Join(projectDir, "internal", "app", "dependencies", "container.go"))
-	modifyRouter(ent, moduleName, filepath.Join(projectDir, "internal", "app", "initializers", "router.go"))
-	modifyApplication(ent, moduleName, filepath.Join(projectDir, "internal", "app", "application.go"))
+func AddToApplication(ent schema.Entity, projectDir string, moduleName string) error {
+	if err := modifyContainer(ent, moduleName, filepath.Join(projectDir, "internal", "app", "dependencies", "container.go")); err != nil {
+		return fmt.Errorf("while adding new entity service to container: %w", err)
+	}
+	if err := modifyRouter(ent, moduleName, filepath.Join(projectDir, "internal", "app", "initializers", "router.go")); err != nil {
+		return fmt.Errorf("while adding new entity controller to router: %w", err)
+	}
+	if err := modifyApplication(ent, moduleName, filepath.Join(projectDir, "internal", "app", "application.go")); err != nil {
+		return fmt.Errorf("while adding new entity to application: %w", err)
+	}
+	return nil
 }

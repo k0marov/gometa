@@ -31,25 +31,24 @@ const (
 
 const UnixTimeExample = 1694801985
 
-func fieldTypeFromInterface(i any) FieldType {
+func fieldTypeFromInterface(i any) (FieldType, error) {
 	kind := reflect.TypeOf(i).Kind()
 	switch kind {
 	case reflect.Float64:
 		num := i.(float64)
 		if num == float64(int(num)) {
 			if int(num) == UnixTimeExample {
-				return TimeUnix
+				return TimeUnix, nil
 			}
-			return Int
+			return Int, nil
 		}
-		return Float
+		return Float, nil
 	case reflect.Bool:
-		return Bool
+		return Bool, nil
 	case reflect.String:
-		return String
+		return String, nil
 	}
-	log.Fatalf("got field type %#v of unknown kind %s", i, kind.String())
-	return "unknown"
+	return "", fmt.Errorf("unknown type %v kind, value %v i", kind, i)
 }
 
 func (t FieldType) GolangType() string {

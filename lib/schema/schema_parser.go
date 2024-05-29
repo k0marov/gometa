@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/k0marov/gometa/lib/helpers"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -14,7 +13,10 @@ import (
 const PrimaryKeyName = "id"
 
 func Parse(filePath string) (Entity, error) {
-	jsonEntity := parseJsonFile(filePath)
+	jsonEntity, err := parseJsonFile(filePath)
+	if err != nil {
+		return Entity{}, err
+	}
 
 	_, fileName := filepath.Split(filePath)
 	jsonName := strings.Split(fileName, ".")[0]
@@ -25,10 +27,14 @@ func Parse(filePath string) (Entity, error) {
 	}
 	hasPrimaryKey := false
 	for name, exampleValue := range jsonEntity {
+		fieldType, err := fieldTypeFromInterface(exampleValue)
+		if err != nil {
+			return Entity{}, fmt.Errorf("getting field type for %q: %w", name, err)
+		}
 		field := Field{
 			JsonName: name,
 			GoName:   helpers.JsonNameToPascalCase(name),
-			Type:     fieldTypeFromInterface(exampleValue),
+			Type:     fieldType,
 		}
 		if field.JsonName == PrimaryKeyName {
 			field.GoName = "ID" // convention of gorm
@@ -52,15 +58,15 @@ func Parse(filePath string) (Entity, error) {
 	return ent, nil
 }
 
-func parseJsonFile(filePath string) map[string]any {
+func parseJsonFile(filePath string) (map[string]any, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		log.Fatalf("unable to open entity scheme file: %v", err)
+		return nil, fmt.Errorf("unable to open entity scheme file %q: %w", filePath, err)
 	}
 	entityScheme := map[string]any{}
 	err = json.NewDecoder(file).Decode(&entityScheme)
 	if err != nil {
-		log.Fatalf("unable to unmarshal entity scheme at %q as json: %v", filePath, err)
+		return nil, fmt.Errorf("unable to unmarshal entity scheme at %q as json: %w", filePath, err)
 	}
-	return entityScheme
+	return entityScheme, nil
 }

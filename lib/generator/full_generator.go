@@ -10,7 +10,6 @@ import (
 	"github.com/k0marov/gometa/lib/helpers"
 	"github.com/k0marov/gometa/lib/schema"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,41 +31,61 @@ func GetGoModuleName(goModContents io.Reader) (string, error) {
 	return firstLine[1], nil
 }
 
-func Generate(schemaPath, projectDir string) {
+func Generate(schemaPath, projectDir string) error {
 	goMod, err := os.Open(filepath.Join(projectDir, "go.mod"))
 	if err != nil {
-		log.Fatalf("while opening project go.mod: %v", err)
+		return fmt.Errorf("while opening project go.mod: %w", err)
 	}
 	defer goMod.Close()
 	moduleName, err := GetGoModuleName(goMod)
 	if err != nil {
-		log.Fatalf("getting go module name: %v", err)
+		return fmt.Errorf("getting go module name: %w", err)
 	}
 
 	schemaPath, _ = filepath.Abs(schemaPath)
 
 	ent, err := schema.Parse(schemaPath)
 	if err != nil {
-		log.Fatalf("failed parsing schema: %v", err)
+		return fmt.Errorf("failed parsing schema: %w", err)
 	}
 	internalDir := filepath.Join(projectDir, "internal")
 
-	entityFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "models", fmt.Sprintf("%s.go", ent.JsonName)))
-	entity_struct.Generate(ent, entityFile, "models")
+	entityFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "models", fmt.Sprintf("%s.go", ent.JsonName)))
+	if err != nil {
+		return err
+	}
+	if err := entity_struct.Generate(ent, entityFile, "models"); err != nil {
+		return fmt.Errorf("generating model file: %w", err)
+	}
 
 	entityImportPath := fmt.Sprintf("%s/internal/models", moduleName)
 
-	//entityImportPath := helpers.GetGoImportPath(filepath.Join(internalDir, "entity"))
-	//basePackagePath := strings.TrimSuffix(entityImportPath, "/entity")
+	repoFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", ent.JsonName, "repository.go"))
+	if err != nil {
+		return err
+	}
+	if err := repository.Generate(ent, repoFile, moduleName, ent.JsonName, entityImportPath); err != nil {
+		return fmt.Errorf("generating model file: %w", err)
+	}
 
-	repoFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", ent.JsonName, "repository.go"))
-	repository.Generate(ent, repoFile, moduleName, ent.JsonName, entityImportPath)
+	serviceFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "services", ent.JsonName, "service.go"))
+	if err != nil {
+		return err
+	}
+	if err := service.Generate(ent, serviceFile, moduleName, entityImportPath); err != nil {
+		return fmt.Errorf("generating service file: %w", err)
+	}
 
-	serviceFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "services", ent.JsonName, "service.go"))
-	service.Generate(ent, serviceFile, moduleName, entityImportPath)
+	handlersFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", ent.JsonName, "controller.go"))
+	if err != nil {
+		return err
+	}
+	if err := delivery.GenerateHandlers(ent, handlersFile, moduleName, ent.JsonName, entityImportPath); err != nil {
+		return fmt.Errorf("generating handlers layer: %w", err)
+	}
 
-	handlersFile := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", ent.JsonName, "controller.go"))
-	delivery.GenerateHandlers(ent, handlersFile, moduleName, ent.JsonName, entityImportPath)
-
-	setup.AddToApplication(ent, projectDir, moduleName)
+	if err := setup.AddToApplication(ent, projectDir, moduleName); err != nil {
+		return fmt.Errorf("adding new crud to DI: %w", err)
+	}
+	return nil
 }
