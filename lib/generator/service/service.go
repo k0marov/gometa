@@ -19,7 +19,7 @@ import (
 )
 
 type Repo interface {
-    Create(entity models.{{ .EntityName }}) (models.{{.EntityName}}, error)
+    Create(dto models.Create{{ .EntityName }}DTO) (models.{{.EntityName}}, error)
     Get(id string) (models.{{ .EntityName }}, error) 
     GetAll() ([]models.{{ .EntityName }}, error) 
     Update(entity models.{{ .EntityName }}) error 
@@ -34,10 +34,10 @@ func NewServiceImpl(repo Repo) *ServiceImpl {
     return &ServiceImpl{repo: repo}
 }
 
-func (s *ServiceImpl) Create(ctx context.Context, entity models.{{ .EntityName }}) (models.{{ .EntityName }}, error) {
-	logger.Debug("creating {{ .EntityName}}", "value", entity) 
+func (s *ServiceImpl) Create(ctx context.Context, dto models.Create{{ .EntityName }}DTO) (models.{{ .EntityName }}, error) {
+	logger.Debug("creating {{ .EntityName}}", "value", dto) 
     // TODO: add business logic to Service.Create
-    return s.repo.Create(entity)
+    return s.repo.Create(dto)
 }
 
 func (s *ServiceImpl) Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) {
