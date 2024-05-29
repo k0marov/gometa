@@ -75,6 +75,13 @@ func Generate(schemaPath, projectDir string) error {
 		return fmt.Errorf("generating service file: %w", err)
 	}
 
+	handlersMappersFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", goPackageName, "mappers.go"))
+	if err != nil {
+		return err
+	}
+	if err := delivery.GenerateMappers(handlersMappersFile, ent, baseGenCtx.WithPackageName(goPackageName)); err != nil {
+		return fmt.Errorf("generating mappers for json: %w", err)
+	}
 	handlersFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", goPackageName, "controller.go"))
 	if err != nil {
 		return err
@@ -82,6 +89,7 @@ func Generate(schemaPath, projectDir string) error {
 	if err := delivery.GenerateHandlers(handlersFile, baseGenCtx.WithPackageName(goPackageName)); err != nil {
 		return fmt.Errorf("generating handlers layer: %w", err)
 	}
+	// TODO: close files
 
 	if err := setup.AddToDI(goPackageName, ent.Name, projectDir, moduleName); err != nil {
 		return fmt.Errorf("adding new crud to DI: %w", err)

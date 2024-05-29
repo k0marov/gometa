@@ -83,3 +83,7 @@ func (f Field) GetGormTags() string {
 	}
 	return ""
 }
+
+func (f Field) GetJsonTags() string {
+	return fmt.Sprintf("`json:\"%s\"`", f.JsonName)
+}
