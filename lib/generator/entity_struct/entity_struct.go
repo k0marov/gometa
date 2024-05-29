@@ -18,7 +18,7 @@ type {{ .Entity.Name }} struct {
 }
 `))
 
-func Generate(ent schema.Entity, out io.Writer, packageName string) error {
+func Generate(out io.Writer, ent schema.Entity, packageName string) error {
 	templateData := struct {
 		PackageName string
 		Entity      schema.Entity
