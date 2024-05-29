@@ -53,20 +53,20 @@ func (h *Handlers) DefineRoutes(r gin.IRouter) {
 // @Tags {{.PackageName}} 
 // @Accept json 
 // @Produce json 
-// @Param {{.EntityName}} body models.{{.EntityName}} true "info about new object"
-// @Success 201 {object} models.{{.EntityName}} 
+// @Param {{.EntityName}} body {{.EntityName}} true "info about new object"
+// @Success 201 {object} {{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s [post]
 func (h *Handlers) Create(c *gin.Context) { 
-    toCreate := new(models.{{ .EntityName }})
+    toCreate := new({{ .EntityName }})
     if c.BindJSON(toCreate) != nil {
         return 
     }
-    created, err := h.svc.Create(c.Request.Context(), toCreate)
+    created, err := h.svc.Create(c.Request.Context(), toCreate.ToEntity())
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
-	c.JSON(http.StatusCreated, created) 
+	c.JSON(http.StatusCreated, MapEntity(created)) 
 }
 
 // Get godoc 
@@ -76,7 +76,7 @@ func (h *Handlers) Create(c *gin.Context) {
 // @Tags {{.PackageName}} 
 // @Accept json 
 // @Produce json 
-// @Success 200 {object} models.{{.EntityName}} 
+// @Success 200 {object} {{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s/:id [get]
 func (h *Handlers) Get(c *gin.Context) { 
 	id := c.Param("id")
@@ -85,7 +85,7 @@ func (h *Handlers) Get(c *gin.Context) {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
-    c.JSON(http.StatusOK, entity)
+    c.JSON(http.StatusOK, MapEntity(entity))
 }
 
 // GetAll godoc 
@@ -95,7 +95,7 @@ func (h *Handlers) Get(c *gin.Context) {
 // @Tags {{.PackageName}} 
 // @Accept json 
 // @Produce json 
-// @Success 200 {object} []models.{{.EntityName}} 
+// @Success 200 {object} []{{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s [get]
 func (h *Handlers) GetAll(c *gin.Context) { 
     entities, err := h.svc.GetAll(c.Request.Context())
@@ -103,7 +103,11 @@ func (h *Handlers) GetAll(c *gin.Context) {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
     }
-    c.JSON(http.StatusOK, entities)
+	mapped := make([]{{.EntityName}}, len(entities)) 
+	for i := range entities {
+		mapped[i] = MapEntity(entities[i]) 
+	}
+    c.JSON(http.StatusOK, mapped)
 }
 
 // Update godoc 
@@ -113,15 +117,15 @@ func (h *Handlers) GetAll(c *gin.Context) {
 // @Tags {{.PackageName}} 
 // @Accept json 
 // @Produce json 
-// @Param upd body models.{{.EntityName}} true "info about updating"
+// @Param upd body {{.EntityName}} true "info about updating"
 // @Success 200 
 // @Router /api/v1/{{.PackageName}}s [put]
 func (h *Handlers) Update(c *gin.Context) { 
-    upd := new(models.{{ .EntityName }})
+    upd := new({{ .EntityName }})
     if c.BindJSON(&upd) != nil {
         return 
     }
-    err := h.svc.Update(c.Request.Context(), upd)
+    err := h.svc.Update(c.Request.Context(), upd.ToEntity())
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 
