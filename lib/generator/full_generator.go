@@ -76,7 +76,7 @@ func Generate(schemaPath, projectDir string) error {
 		return fmt.Errorf("generating handlers layer: %w", err)
 	}
 
-	if err := setup.AddToApplication(goPackageName, ent.Name, projectDir, moduleName); err != nil {
+	if err := setup.AddToDI(goPackageName, ent.Name, projectDir, moduleName); err != nil {
 		return fmt.Errorf("adding new crud to DI: %w", err)
 	}
 	return nil
