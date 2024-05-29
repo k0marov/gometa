@@ -27,39 +27,48 @@ type RepositoryImpl struct {
 }
 
 func NewRepositoryImpl(db *gorm.DB) *RepositoryImpl {
-    if err := db.AutoMigrate(&models.{{.EntityName}}{}); err != nil {
+    if err := db.AutoMigrate(&{{.EntityName}}{}); err != nil {
 		log.Fatalf("failed migrating for {{.EntityName}}: %v", err) 
 	}
     return &RepositoryImpl{db: db}
 }
 
-func (r *RepositoryImpl) Create(entity *models.{{ .EntityName }}) (*models.{{.EntityName}}, error) {
-    return entity, r.db.Create(entity).Error
-}
-
-func (r *RepositoryImpl) Get(id string) (*models.{{ .EntityName }}, error) {
-    entity := new(models.{{ .EntityName }})
-    err := r.db.Where("id = ?", id).First(entity).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, clienterrs.ErrNotFound
+func (r *RepositoryImpl) Create(entity models.{{ .EntityName }}) (models.{{.EntityName}}, error) {
+	dbModel := MapEntity(entity) 
+    if err := r.db.Create(&dbModel).Error; err != nil {
+		return models.{{.EntityName}}{}, fmt.Errorf("creating entity in repo: %w", err)
 	}
-    return entity, err
+	return dbModel.ToEntity(), nil
 }
 
-func (r *RepositoryImpl) GetAll() ([]*models.{{ .EntityName }}, error) {
-	var entities []*models.{{ .EntityName }} 
-	if err := r.db.Find(&entities).Error; err != nil {
+func (r *RepositoryImpl) Get(id string) (models.{{ .EntityName }}, error) {
+    dbModel := new({{ .EntityName }})
+    err := r.db.Where("id = ?", id).First(dbModel).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return models.{{ .EntityName }}{}, clienterrs.ErrNotFound
+	}
+    return dbModel.ToEntity(), err
+}
+
+func (r *RepositoryImpl) GetAll() ([]models.{{ .EntityName }}, error) {
+	var dbModels []*{{ .EntityName }} 
+	if err := r.db.Find(&dbModels).Error; err != nil {
 		return nil, fmt.Errorf("getting all rows from sql: %w", err) 	
+	}
+	entities := make([]models.{{ .EntityName }}, len(dbModels)) 
+	for i := range dbModels {
+		entities[i] = dbModels[i].ToEntity()
 	}
 	return entities, nil
 }
 
-func (r *RepositoryImpl) Update(entity *models.{{ .EntityName }}) error {
-    return r.db.Model(entity).Updates(entity).Error
+func (r *RepositoryImpl) Update(entity models.{{ .EntityName }}) error {
+    return r.db.Model(&{{.EntityName}}{}).Updates(MapEntity(entity)).Error
 }
 
 func (r *RepositoryImpl) Delete(id string) error {
-    return r.db.Delete(&models.{{.EntityName}}{}, id).Error
+	// TODO: return error if not found 
+    return r.db.Delete(&{{.EntityName}}{}, id).Error
 }
 `))
 

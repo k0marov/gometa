@@ -23,10 +23,10 @@ import (
 )
 
 type Service interface {
-    Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error)
-    Get(ctx context.Context, id string) (*models.{{ .EntityName }}, error) 
-    GetAll(ctx context.Context) ([]*models.{{ .EntityName }}, error) 
-    Update(ctx context.Context, entity *models.{{ .EntityName }}) error 
+    Create(ctx context.Context, entity models.{{ .EntityName }}) (models.{{ .EntityName }}, error)
+    Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) 
+    GetAll(ctx context.Context) ([]models.{{ .EntityName }}, error) 
+    Update(ctx context.Context, entity models.{{ .EntityName }}) error 
     Delete(ctx context.Context, id string) error 
 }
 

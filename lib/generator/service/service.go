@@ -19,10 +19,10 @@ import (
 )
 
 type Repo interface {
-    Create(entity *models.{{ .EntityName }}) (*models.{{.EntityName}}, error)
-    Get(id string) (*models.{{ .EntityName }}, error) 
-    GetAll() ([]*models.{{ .EntityName }}, error) 
-    Update(entity *models.{{ .EntityName }}) error 
+    Create(entity models.{{ .EntityName }}) (models.{{.EntityName}}, error)
+    Get(id string) (models.{{ .EntityName }}, error) 
+    GetAll() ([]models.{{ .EntityName }}, error) 
+    Update(entity models.{{ .EntityName }}) error 
     Delete(id string) error 
 }
 
@@ -34,26 +34,26 @@ func NewServiceImpl(repo Repo) *ServiceImpl {
     return &ServiceImpl{repo: repo}
 }
 
-func (s *ServiceImpl) Create(ctx context.Context, entity *models.{{ .EntityName }}) (*models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) Create(ctx context.Context, entity models.{{ .EntityName }}) (models.{{ .EntityName }}, error) {
 	logger.Debug("creating {{ .EntityName}}", "value", entity) 
     // TODO: add business logic to Service.Create
     return s.repo.Create(entity)
 }
 
-func (s *ServiceImpl) Get(ctx context.Context, id string) (*models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) {
 	logger.Debug("getting {{ .EntityName}}", "id", id) 
     entity, err := s.repo.Get(id)
     // TODO: add business logic to Service.Get
     return entity, err
 }
 
-func (s *ServiceImpl) GetAll(ctx context.Context) ([]*models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) GetAll(ctx context.Context) ([]models.{{ .EntityName }}, error) {
 	logger.Debug("getting all {{ .EntityName}}s") 
     // TODO: add business logic 
     return s.repo.GetAll()
 }
 
-func (s *ServiceImpl) Update(ctx context.Context, entity *models.{{ .EntityName }}) error {
+func (s *ServiceImpl) Update(ctx context.Context, entity models.{{ .EntityName }}) error {
 	logger.Debug("updating {{.EntityName}}", "value", entity) 
     // TODO: add business logic to Service.Update
     return s.repo.Update(entity)
