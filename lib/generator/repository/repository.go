@@ -71,7 +71,13 @@ func (r *RepositoryImpl) Update(ctx context.Context, entity models.{{ .EntityNam
 }
 
 func (r *RepositoryImpl) Delete(ctx context.Context, id string) error {
-	// TODO: return error if not found 
+	var cnt int64
+    if err := r.db.Model(&{{.EntityName}}{}).Where("id = ?", id).Count(&cnt).Error; err != nil {
+		return fmt.Errorf("checking for {{.EntityName}} with id %q existence in db: %w", err) 
+	}
+	if cnt == 0 {
+		return clienterrs.ErrNotFound 
+	}
     return r.db.Where("id = ?", id).Delete(&{{.EntityName}}{}).Error
 }
 `))
