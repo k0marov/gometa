@@ -28,6 +28,9 @@ type RepositoryImpl struct {
 }
 
 func NewRepositoryImpl(db *gorm.DB) *RepositoryImpl {
+	if err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"").Error; err != nil {
+    	log.Fatalf("failed to exec CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\", error: %v", err)
+	}
     if err := db.AutoMigrate(&{{.EntityName}}{}); err != nil {
 		log.Fatalf("failed migrating for {{.EntityName}}: %v", err) 
 	}
@@ -69,7 +72,7 @@ func (r *RepositoryImpl) Update(ctx context.Context, entity models.{{ .EntityNam
 
 func (r *RepositoryImpl) Delete(ctx context.Context, id string) error {
 	// TODO: return error if not found 
-    return r.db.Delete(&{{.EntityName}}{}, id).Error
+    return r.db.Where("id = ?", id).Delete(&{{.EntityName}}{}).Error
 }
 `))
 

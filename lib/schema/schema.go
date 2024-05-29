@@ -74,7 +74,7 @@ func (f Field) IsPrimaryKey() bool {
 
 func (f Field) GetGormTags() string {
 	if f.IsPrimaryKey() && f.Type == String {
-		return "`gorm:\"type:uuid;default:uuid_generate_v4()\"`"
+		return "`gorm:\"default:uuid_generate_v4()\"`"
 	}
 	return ""
 }
