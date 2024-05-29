@@ -68,15 +68,6 @@ func (t FieldType) GolangType() string {
 	return "UNKNOWN"
 }
 
-func (f Field) GetGoTags() string {
-	tags := fmt.Sprintf("`json:\"%s\"", f.JsonName)
-	if f.JsonName == PrimaryKeyName && f.Type == String {
-		tags += " gorm:\"type:uuid;default:uuid_generate_v4()\""
-	}
-	tags += "`"
-	return tags
-}
-
 func (f Field) GetGormTags() string {
 	if f.JsonName == PrimaryKeyName && f.Type == String {
 		return "`gorm:\"type:uuid;default:uuid_generate_v4()\"`"

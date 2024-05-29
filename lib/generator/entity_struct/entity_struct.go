@@ -14,7 +14,7 @@ package {{ .PackageName }}
 
 type {{ .Entity.Name }} struct {
 	{{ range $field := .Entity.Fields }} 
-	{{ $field.GoName }} {{ $field.Type.GolangType }} {{ $field.GetGoTags }} {{ end }}
+	{{ $field.GoName }} {{ $field.Type.GolangType }} {{ end }}
 }
 `))
 
