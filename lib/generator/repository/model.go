@@ -35,6 +35,15 @@ func MapEntity(e models.{{ .Entity.Name }}) {{ .Entity.Name }} {
 		{{ $field.GoName }}: e.{{ $field.GoName }}, {{ end }}
 	}
 }
+
+func MapCreateDTO(dto models.Create{{ .Entity.Name }}DTO) {{ .Entity.Name }} {
+	return {{ .Entity.Name }}{
+		{{ range $field := .Entity.Fields }} 
+		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
+		{{ $field.GoName }}: dto.{{ $field.GoName }}, {{ end }}
+	}
+}
+
 `))
 
 // TODO: remove unneeded newline after models.{

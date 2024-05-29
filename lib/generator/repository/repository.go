@@ -33,8 +33,8 @@ func NewRepositoryImpl(db *gorm.DB) *RepositoryImpl {
     return &RepositoryImpl{db: db}
 }
 
-func (r *RepositoryImpl) Create(entity models.{{ .EntityName }}) (models.{{.EntityName}}, error) {
-	dbModel := MapEntity(entity) 
+func (r *RepositoryImpl) Create(dto models.Create{{ .EntityName }}DTO) (models.{{.EntityName}}, error) {
+	dbModel := MapCreateDTO(dto) 
     if err := r.db.Create(&dbModel).Error; err != nil {
 		return models.{{.EntityName}}{}, fmt.Errorf("creating entity in repo: %w", err)
 	}
