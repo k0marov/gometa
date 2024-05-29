@@ -36,6 +36,7 @@ func Generate(schemaPath, projectDir string) error {
 	internalDir := filepath.Join(projectDir, "internal")
 
 	entityFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "models", fmt.Sprintf("%s.go", ent.JsonName)))
+	defer entityFile.Close()
 	if err != nil {
 		return err
 	}
@@ -53,6 +54,7 @@ func Generate(schemaPath, projectDir string) error {
 	goPackageName := ent.JsonName
 
 	repoModelsFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", goPackageName, "models.go"))
+	defer repoModelsFile.Close()
 	if err != nil {
 		return err
 	}
@@ -60,6 +62,7 @@ func Generate(schemaPath, projectDir string) error {
 		return fmt.Errorf("generating repo models.go file: %w", err)
 	}
 	repoFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "repository", goPackageName, "repository.go"))
+	defer repoFile.Close()
 	if err != nil {
 		return err
 	}
@@ -68,6 +71,7 @@ func Generate(schemaPath, projectDir string) error {
 	}
 
 	serviceFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "services", goPackageName, "service.go"))
+	defer serviceFile.Close()
 	if err != nil {
 		return err
 	}
@@ -76,6 +80,7 @@ func Generate(schemaPath, projectDir string) error {
 	}
 
 	handlersMappersFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", goPackageName, "mappers.go"))
+	defer handlersMappersFile.Close()
 	if err != nil {
 		return err
 	}
@@ -83,13 +88,13 @@ func Generate(schemaPath, projectDir string) error {
 		return fmt.Errorf("generating mappers for json: %w", err)
 	}
 	handlersFile, err := helpers.CreateFileRecursively(filepath.Join(internalDir, "web", "controllers", "apiv1", goPackageName, "controller.go"))
+	defer handlersFile.Close()
 	if err != nil {
 		return err
 	}
 	if err := delivery.GenerateHandlers(handlersFile, baseGenCtx.WithPackageName(goPackageName)); err != nil {
 		return fmt.Errorf("generating handlers layer: %w", err)
 	}
-	// TODO: close files
 
 	if err := setup.AddToDI(goPackageName, ent.Name, projectDir, moduleName); err != nil {
 		return fmt.Errorf("adding new crud to DI: %w", err)
