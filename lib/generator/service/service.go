@@ -14,6 +14,7 @@ package {{ .PackageName }}
 
 import (
 	"context"
+	"fmt"
 	"{{ .ModuleName }}/pkg/logger"
     "{{ .EntityImport }}"
 )
@@ -42,27 +43,42 @@ func (s *ServiceImpl) Create(ctx context.Context, dto models.Create{{ .EntityNam
 
 func (s *ServiceImpl) Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) {
 	logger.Debug("getting {{ .EntityName}}", "id", id) 
-    entity, err := s.repo.Get(ctx, id)
     // TODO: add business logic to Service.Get
-    return entity, err
+    entity, err := s.repo.Get(ctx, id)
+	if err != nil {
+		return models.{{ .EntityName }}{}, fmt.Errorf("getting from repo: %w", err)
+	}
+    return entity, nil
 }
 
 func (s *ServiceImpl) GetAll(ctx context.Context) ([]models.{{ .EntityName }}, error) {
 	logger.Debug("getting all {{ .EntityName}}s") 
     // TODO: add business logic 
-    return s.repo.GetAll(ctx)
+    entities, err := s.repo.GetAll(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("getting all from repo: %w", err) 
+	}
+	return entities, nil 
 }
 
 func (s *ServiceImpl) Update(ctx context.Context, entity models.{{ .EntityName }}) error {
 	logger.Debug("updating {{.EntityName}}", "value", entity) 
     // TODO: add business logic to Service.Update
-    return s.repo.Update(ctx, entity)
+    err := s.repo.Update(ctx, entity)
+	if err != nil {
+		return fmt.Errorf("updating in repo: %w", err)
+	}
+	return nil	
 }
 
 func (s *ServiceImpl) Delete(ctx context.Context, id string) error {
 	logger.Debug("deleting {{.EntityName}}", "id", id) 
     // TODO: add business logic to Service.Delete
-    return s.repo.Delete(ctx, id)
+    err := s.repo.Delete(ctx, id)
+	if err != nil {
+		return fmt.Errorf("deleting in repo: %w", err)
+	}
+	return nil 
 }
 `))
 

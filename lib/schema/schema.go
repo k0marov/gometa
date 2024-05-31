@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"reflect"
+	"slices"
 )
 
 type Entity struct {
@@ -51,6 +52,10 @@ func fieldTypeFromInterface(i any) (FieldType, error) {
 	return "", fmt.Errorf("unknown type %v kind, value %v i", kind, i)
 }
 
+func (e Entity) HasTimeField() bool {
+	return slices.ContainsFunc(e.Fields, func(f Field) bool { return f.Type == TimeUnix })
+}
+
 func (t FieldType) GolangType() string {
 	switch t {
 	case Int:
@@ -62,7 +67,7 @@ func (t FieldType) GolangType() string {
 	case String:
 		return "string"
 	case TimeUnix:
-		return "int"
+		return "time.Time"
 	}
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"

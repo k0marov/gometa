@@ -12,6 +12,10 @@ import (
 var entityTemplate = template.Must(template.New("").Parse(`
 package {{ .PackageName }} 
 
+{{ if .Entity.HasTimeField }} 
+import "time"
+{{ end }}
+
 type {{ .Entity.Name }} struct {
 	{{ range $field := .Entity.Fields }} 
 	{{ $field.GoName }} {{ $field.Type.GolangType }} {{ end }}

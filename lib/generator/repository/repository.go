@@ -67,7 +67,11 @@ func (r *RepositoryImpl) GetAll(ctx context.Context, ) ([]models.{{ .EntityName 
 }
 
 func (r *RepositoryImpl) Update(ctx context.Context, entity models.{{ .EntityName }}) error {
-    return r.db.WithContext(ctx).Model(&{{.EntityName}}{}).Updates(MapEntity(entity)).Error
+    err := r.db.WithContext(ctx).Model(&{{.EntityName}}{}).Updates(MapEntity(entity)).Error	
+	if err != nil {
+		return fmt.Errorf("updating in sql: %w", err)
+	}
+	return nil 
 }
 
 func (r *RepositoryImpl) Delete(ctx context.Context, id string) error {
