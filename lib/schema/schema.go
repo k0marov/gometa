@@ -53,7 +53,7 @@ func fieldTypeFromInterface(i any) (FieldType, error) {
 }
 
 func (e Entity) HasTimeField() bool {
-	return slices.ContainsFunc(e.Fields, func(f Field) bool { return f.Type == TimeUnix })
+	return slices.ContainsFunc(e.Fields, Field.IsTime)
 }
 
 func (t FieldType) GolangType() string {
@@ -71,6 +71,10 @@ func (t FieldType) GolangType() string {
 	}
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"
+}
+
+func (f Field) IsTime() bool {
+	return f.Type == TimeUnix
 }
 
 func (f Field) IsPrimaryKey() bool {

@@ -15,31 +15,29 @@ package {{ .PackageName }}
 
 import (
     "{{.EntityImport}}"
+	{{ if .Entity.HasTimeField }} "time" {{ end }}
 )
 
-type Create{{ .Entity.Name }}Req struct {
-	{{ range $field := .Entity.Fields }} 
-		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
-		{{ $field.GoName }} {{ $field.Type.GolangType }} {{ $field.GetJsonTags }} 
+type Create{{ .Entity.Name }}Req struct { {{ range $field := .Entity.Fields }} 
+		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }} 
+		{{ $field.GoName }} {{ if $field.IsTime }} int64 {{ else }} {{ $field.Type.GolangType }} {{ end }} {{ $field.GetJsonTags }} 
 	{{ end }}
 }
 
-type {{ .Entity.Name }} struct {
-	{{ range $field := .Entity.Fields }} 
-	{{ $field.GoName }} {{ $field.Type.GolangType }} {{ $field.GetJsonTags }} {{ end }}
+type {{ .Entity.Name }} struct { {{ range $field := .Entity.Fields }} 
+	{{ $field.GoName }} {{ if $field.IsTime }} int64 {{ else }} {{ $field.Type.GolangType }} {{ end }} {{ $field.GetJsonTags }} {{ end }}
 }
 
 func (e *{{ .Entity.Name }}) ToEntity() models.{{.Entity.Name}} {
-	return models.{{ .Entity.Name }}{
-		{{ range $field := .Entity.Fields }} 
-		{{ $field.GoName }}: e.{{ $field.GoName }}, {{ end }}
+	return models.{{ .Entity.Name }}{ {{ range $field := .Entity.Fields }} 
+		{{ $field.GoName }}: {{ if $field.IsTime }} time.Unix(e.{{$field.GoName}}, 0) {{ else }} e.{{ $field.GoName }} {{ end }}, {{ end }}
 	}
 }
 
 func MapEntity(e models.{{ .Entity.Name }}) {{ .Entity.Name }} {
 	return {{ .Entity.Name }}{
 		{{ range $field := .Entity.Fields }} 
-		{{ $field.GoName }}: e.{{ $field.GoName }}, {{ end }}
+		{{ $field.GoName }}: {{ if $field.IsTime }} e.{{$field.GoName}}.Unix() {{ else }} e.{{ $field.GoName }} {{ end }}, {{ end }} 
 	}
 }
 
@@ -47,7 +45,7 @@ func (c Create{{.Entity.Name}}Req) ToDTO() models.Create{{.Entity.Name}}DTO {
 	return models.Create{{.Entity.Name}}DTO{
 		{{ range $field := .Entity.Fields }} 
 			{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
-			{{ $field.GoName }}: c.{{ $field.GoName }},
+			{{ $field.GoName }}: {{ if $field.IsTime }} time.Unix(c.{{$field.GoName}}, 0) {{ else }} c.{{ $field.GoName }} {{ end }}, 
 		{{ end }}
 	}
 }
