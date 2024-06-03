@@ -16,8 +16,11 @@ import (
 	"context"
 	"fmt"
 	"{{ .ModuleName }}/pkg/logger"
+	"{{ .ModuleName }}/internal/clienterrs"
     "{{ .EntityImport }}"
 )
+
+const MaxPageSize = 100 
 
 type Repo interface {
     Create(ctx context.Context, dto models.Create{{ .EntityName }}DTO) (models.{{.EntityName}}, error)
@@ -57,6 +60,9 @@ func (s *ServiceImpl) GetAll(ctx context.Context, page int, pageSize int) ([]mod
 	if page <= 0 {
 		page = 1 
 	} 
+	if pageSize <= 0 || pageSize > MaxPageSize {
+		return nil, clienterrs.ErrInvalidPageSizeParam
+	}
 	limit := pageSize 
 	offset := (page-1) * pageSize 
     entities, err := s.repo.GetAll(ctx, limit, offset)
