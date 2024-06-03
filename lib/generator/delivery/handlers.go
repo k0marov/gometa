@@ -16,6 +16,7 @@ import (
     "net/http"
     "github.com/gin-gonic/gin"
 	"context"
+	"strconv"
     "{{ .EntityImport }}"
 	"{{ .ModuleName }}/internal/clienterrs"
 )
@@ -23,7 +24,7 @@ import (
 type Service interface {
     Create(ctx context.Context, dto models.Create{{ .EntityName }}DTO) (models.{{ .EntityName }}, error)
     Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) 
-    GetAll(ctx context.Context) ([]models.{{ .EntityName }}, error) 
+    GetAll(ctx context.Context, page, pageSize int) ([]models.{{ .EntityName }}, error) 
     Update(ctx context.Context, entity models.{{ .EntityName }}) error 
     Delete(ctx context.Context, id string) error 
 }
@@ -91,12 +92,24 @@ func (h *Handlers) Get(c *gin.Context) {
 // @Description Gets all {{ .EntityName }} saved in db
 // @ID get-all-{{.PackageName}}
 // @Tags {{.PackageName}} 
+// @Param page query int true "page number, starting from 1"
+// @Param pageSize query int true "page size"
 // @Accept json 
 // @Produce json 
 // @Success 200 {object} []{{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s [get]
 func (h *Handlers) GetAll(c *gin.Context) { 
-    entities, err := h.svc.GetAll(c.Request.Context())
+	page, err := strconv.Atoi(c.Param("page"))
+	if err != nil {
+		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrInvalidPageParam)
+		return
+	}
+	pageSize, err := strconv.Atoi(c.Param("pageSize"))
+	if err != nil {
+		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrInvalidPageSizeParam)
+		return
+	}
+    entities, err := h.svc.GetAll(c.Request.Context(), page, pageSize)
     if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, err) 
         return 

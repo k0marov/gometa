@@ -22,7 +22,7 @@ import (
 type Repo interface {
     Create(ctx context.Context, dto models.Create{{ .EntityName }}DTO) (models.{{.EntityName}}, error)
     Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) 
-    GetAll(ctx context.Context, ) ([]models.{{ .EntityName }}, error) 
+    GetAll(ctx context.Context, limit, offset int) ([]models.{{ .EntityName }}, error) 
     Update(ctx context.Context, entity models.{{ .EntityName }}) error 
     Delete(ctx context.Context, id string) error 
 }
@@ -51,12 +51,17 @@ func (s *ServiceImpl) Get(ctx context.Context, id string) (models.{{ .EntityName
     return entity, nil
 }
 
-func (s *ServiceImpl) GetAll(ctx context.Context) ([]models.{{ .EntityName }}, error) {
-	logger.Debug("getting all {{ .EntityName}}s") 
+func (s *ServiceImpl) GetAll(ctx context.Context, page int, pageSize int) ([]models.{{ .EntityName }}, error) {
     // TODO: add business logic 
-    entities, err := s.repo.GetAll(ctx)
+	logger.Debug("getting all {{ .EntityName}}s", "page", page, "page_size", pageSize) 
+	if page <= 0 {
+		page = 1 
+	} 
+	limit := pageSize 
+	offset := (page-1) * pageSize 
+    entities, err := s.repo.GetAll(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("getting all from repo: %w", err) 
+		return nil, fmt.Errorf("getting {{.EntityName}} entities from repo: %w", err) 
 	}
 	return entities, nil 
 }

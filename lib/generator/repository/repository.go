@@ -54,10 +54,10 @@ func (r *RepositoryImpl) Get(ctx context.Context, id string) (models.{{ .EntityN
     return dbModel.ToEntity(), err
 }
 
-func (r *RepositoryImpl) GetAll(ctx context.Context, ) ([]models.{{ .EntityName }}, error) {
+func (r *RepositoryImpl) GetAll(ctx context.Context, limit, offset int) ([]models.{{ .EntityName }}, error) {
 	var dbModels []*{{ .EntityName }} 
-	if err := r.db.WithContext(ctx).Find(&dbModels).Error; err != nil {
-		return nil, fmt.Errorf("getting all rows from sql: %w", err) 	
+	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&dbModels).Error; err != nil {
+		return nil, fmt.Errorf("getting rows from sql: %w", err) 	
 	}
 	entities := make([]models.{{ .EntityName }}, len(dbModels)) 
 	for i := range dbModels {
