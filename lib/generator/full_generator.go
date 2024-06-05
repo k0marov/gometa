@@ -92,7 +92,7 @@ func Generate(schemaPath, projectDir string) error {
 	if err != nil {
 		return err
 	}
-	if err := delivery.GenerateHandlers(handlersFile, baseGenCtx.WithPackageName(goPackageName)); err != nil {
+	if err := delivery.GenerateHandlers(handlersFile, ent, baseGenCtx.WithPackageName(goPackageName)); err != nil {
 		return fmt.Errorf("generating handlers layer: %w", err)
 	}
 
