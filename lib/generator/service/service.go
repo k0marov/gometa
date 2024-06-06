@@ -25,7 +25,7 @@ const MaxPageSize = 100
 type Repo interface {
     Create(ctx context.Context, dto models.Create{{ .EntityName }}DTO) (models.{{.EntityName}}, error)
     Get(ctx context.Context, id string) (models.{{ .EntityName }}, error) 
-    GetAll(ctx context.Context, limit, offset int) ([]models.{{ .EntityName }}, error) 
+    GetAll(ctx context.Context, limit, offset int, filters map[string]string) ([]models.{{ .EntityName }}, error) 
     Update(ctx context.Context, entity models.{{ .EntityName }}) error 
     Delete(ctx context.Context, id string) error 
 }
@@ -54,9 +54,9 @@ func (s *ServiceImpl) Get(ctx context.Context, id string) (models.{{ .EntityName
     return entity, nil
 }
 
-func (s *ServiceImpl) GetAll(ctx context.Context, page int, pageSize int) ([]models.{{ .EntityName }}, error) {
+func (s *ServiceImpl) GetAll(ctx context.Context, page int, pageSize int, filters map[string]string) ([]models.{{ .EntityName }}, error) {
     // TODO: add business logic 
-	logger.Debug("getting all {{ .EntityName}}s", "page", page, "page_size", pageSize) 
+	logger.Debug("getting all {{ .EntityName}}s", "page", page, "page_size", pageSize, "filters", filters) 
 	if page <= 0 {
 		page = 1 
 	} 
@@ -65,7 +65,7 @@ func (s *ServiceImpl) GetAll(ctx context.Context, page int, pageSize int) ([]mod
 	}
 	limit := pageSize 
 	offset := (page-1) * pageSize 
-    entities, err := s.repo.GetAll(ctx, limit, offset)
+    entities, err := s.repo.GetAll(ctx, limit, offset, filters)
 	if err != nil {
 		return nil, fmt.Errorf("getting {{.EntityName}} entities from repo: %w", err) 
 	}
