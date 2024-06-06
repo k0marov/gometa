@@ -103,12 +103,12 @@ func (h *Handlers) Get(c *gin.Context) {
 // @Success 200 {object} []{{.EntityName}} 
 // @Router /api/v1/{{.PackageName}}s [get]
 func (h *Handlers) GetAll(c *gin.Context) { 
-	page, err := strconv.Atoi(c.Param("page"))
+	page, err := strconv.Atoi(c.Query("page"))
 	if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrInvalidPageParam)
 		return
 	}
-	pageSize, err := strconv.Atoi(c.Param("pageSize"))
+	pageSize, err := strconv.Atoi(c.Query("pageSize"))
 	if err != nil {
 		clienterrs.WriteErrorResponse(c.Writer, clienterrs.ErrInvalidPageSizeParam)
 		return
