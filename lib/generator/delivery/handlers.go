@@ -90,11 +90,14 @@ func (h *Handlers) Get(c *gin.Context) {
 
 // GetAll godoc 
 // @Summary Get all {{ .EntityName }}s
-// @Description Gets all {{ .EntityName }} saved in db
+// @Description Gets all {{ .EntityName }} entities saved in db with filters and pagination
 // @ID get-all-{{.PackageName}}
 // @Tags {{.PackageName}} 
 // @Param page query int true "page number, starting from 1"
 // @Param pageSize query int true "page size"
+{{ range $field := .Entity.Fields -}} 
+// @Param {{$field.JsonName}} query {{$field.Type.JsonType}} false "filter for {{$field.JsonName}}" 
+{{ end -}}
 // @Accept json 
 // @Produce json 
 // @Success 200 {object} []{{.EntityName}} 

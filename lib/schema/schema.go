@@ -72,6 +72,22 @@ func (t FieldType) GolangType() string {
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"
 }
+func (t FieldType) JsonType() string {
+	switch t {
+	case Int:
+		return "int"
+	case Uint64:
+		return "int"
+	case Float:
+		return "number"
+	case String:
+		return "string"
+	case TimeUnix:
+		return "int"
+	}
+	log.Panicf("Unknown field type %s", t)
+	return "UNKNOWN"
+}
 
 func (f Field) IsTime() bool {
 	return f.Type == TimeUnix
