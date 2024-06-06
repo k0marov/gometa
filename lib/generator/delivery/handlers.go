@@ -39,10 +39,10 @@ func NewController(svc Service) *Handlers {
 }
 
 func (h *Handlers) DefineRoutes(r gin.IRouter) {
-    r.POST("/api/v1/{{.PackageName}}s/", h.Create)
+    r.POST("/api/v1/{{.PackageName}}s", h.Create)
 	r.GET("/api/v1/{{.PackageName}}s/:id", h.Get) 
 	r.GET("/api/v1/{{.PackageName}}s", h.GetAll) 
-    r.PUT("/api/v1/{{.PackageName}}s/", h.Update) 
+    r.PUT("/api/v1/{{.PackageName}}s", h.Update) 
 	r.DELETE("/api/v1/{{.PackageName}}s/:id", h.Delete)
 }
 
