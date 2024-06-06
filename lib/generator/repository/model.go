@@ -15,6 +15,7 @@ package {{ .PackageName }}
 
 import (
     "{{.EntityImport}}"
+	{{ if .Entity.HasTimeField }} "time" {{ end }}
 )
 
 type {{ .Entity.Name }} struct {

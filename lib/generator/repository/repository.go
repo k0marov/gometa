@@ -54,9 +54,12 @@ func (r *RepositoryImpl) Get(ctx context.Context, id string) (models.{{ .EntityN
     return dbModel.ToEntity(), err
 }
 
-func (r *RepositoryImpl) GetAll(ctx context.Context, limit, offset int) ([]models.{{ .EntityName }}, error) {
+
+func (r *RepositoryImpl) GetAll(ctx context.Context, limit, offset int, filters map[string]string) ([]models.{{ .EntityName }}, error) {
+	// for filtration see https://gorm.io/docs/query.html#specify_search_fields
+
 	var dbModels []*{{ .EntityName }} 
-	if err := r.db.WithContext(ctx).Limit(limit).Offset(offset).Find(&dbModels).Error; err != nil {
+	if err := r.db.WithContext(ctx).Where(filters).Limit(limit).Offset(offset).Find(&dbModels).Error; err != nil {
 		return nil, fmt.Errorf("getting rows from sql: %w", err) 	
 	}
 	entities := make([]models.{{ .EntityName }}, len(dbModels)) 
