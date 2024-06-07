@@ -19,7 +19,7 @@ import (
 )
 
 type Create{{ .Entity.Name }}Req struct { {{ range $field := .Entity.Fields }} 
-		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }} 
+		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end -}} 
 		{{ $field.GoName }} {{ if $field.IsTime }} int64 {{ else }} {{ $field.Type.GolangType }} {{ end }} {{ $field.GetJsonTags }} 
 	{{ end }}
 }
@@ -36,18 +36,24 @@ func (e *{{ .Entity.Name }}) ToEntity() models.{{.Entity.Name}} {
 
 func MapEntity(e models.{{ .Entity.Name }}) {{ .Entity.Name }} {
 	return {{ .Entity.Name }}{
-		{{ range $field := .Entity.Fields }} 
+		{{- range $field := .Entity.Fields }} 
 		{{ $field.GoName }}: {{ if $field.IsTime }} e.{{$field.GoName}}.Unix() {{ else }} e.{{ $field.GoName }} {{ end }}, {{ end }} 
 	}
 }
 
 func (c Create{{.Entity.Name}}Req) ToDTO() models.Create{{.Entity.Name}}DTO {
-	return models.Create{{.Entity.Name}}DTO{
-		{{ range $field := .Entity.Fields }} 
-			{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
-			{{ $field.GoName }}: {{ if $field.IsTime }} time.Unix(c.{{$field.GoName}}, 0) {{ else }} c.{{ $field.GoName }} {{ end }}, 
-		{{ end }}
-	}
+	res := models.Create{{.Entity.Name}}DTO{} 
+
+	{{ range $field := .Entity.Fields }} 
+		{{ if $field.IsPrimaryKey -}} {{- continue -}} {{- end -}}
+		{{- if $field.IsTime -}} 
+			if c.{{$field.GoName}} != 0 {
+				res.{{$field.GoName}} = time.Unix(c.{{$field.GoName}}, 0) 
+			} 
+		{{- else -}} res.{{$field.GoName}} = c.{{ $field.GoName -}} 
+		{{- end -}}	
+	{{- end }}
+	return res
 }
 `))
 
