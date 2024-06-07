@@ -21,7 +21,7 @@ func main() {
 	schemaPath := os.Args[1]
 
 	projectPath := "."
-	if len(os.Args) > 1 {
+	if len(os.Args) > 2 {
 		projectPath = os.Args[2]
 	}
 

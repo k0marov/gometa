@@ -19,8 +19,8 @@ import (
 )
 
 type Create{{ .Entity.Name }}Req struct { {{ range $field := .Entity.Fields }} 
-		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end -}} 
-		{{ $field.GoName }} {{ if $field.IsTime }} int64 {{ else }} {{ $field.Type.GolangType }} {{ end }} {{ $field.GetJsonTags }} 
+		{{- if $field.IsPrimaryKey }} {{ continue }} {{ end -}} 
+		{{- $field.GoName }} {{ if $field.IsTime }} int64 {{ else }} {{ $field.Type.GolangType }} {{ end }} {{ $field.GetJsonTags }} 
 	{{ end }}
 }
 

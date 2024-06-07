@@ -23,8 +23,8 @@ type {{ .Entity.Name }} struct {
 
 type Create{{ .Entity.Name }}DTO struct {
 	{{ range $field := .Entity.Fields }} 
-		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
-		{{ $field.GoName }} {{ $field.Type.GolangType }} 
+		{{- if $field.IsPrimaryKey }} {{ continue }} {{ end }}
+		{{- $field.GoName }} {{ $field.Type.GolangType }} 
 	{{ end }}
 }
 `))

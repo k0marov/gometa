@@ -40,7 +40,7 @@ func MapEntity(e models.{{ .Entity.Name }}) {{ .Entity.Name }} {
 func MapCreateDTO(dto models.Create{{ .Entity.Name }}DTO) {{ .Entity.Name }} {
 	return {{ .Entity.Name }}{
 		{{ range $field := .Entity.Fields }} 
-		{{ if $field.IsPrimaryKey }} {{ continue }} {{ end }}
+		{{- if $field.IsPrimaryKey }} {{ continue }} {{ end }}
 		{{ $field.GoName }}: dto.{{ $field.GoName }}, {{ end }}
 	}
 }
