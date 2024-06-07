@@ -1,5 +1,8 @@
 # Gometa 🚀
 
+Запуск без установки: 
+`GOPRIVATE=gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git go run gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/cmd/cli@master`
+
 **Gometa** - это генератор кода для создания CRUD операций (все 3 слоя: контроллер, сервис, репозиторий). Он ориентирован на шаблон **gobase**.
 
 ## Как использовать? 🤔
