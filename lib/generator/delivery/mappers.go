@@ -3,9 +3,9 @@ package delivery
 import (
 	"bytes"
 	"fmt"
-	"github.com/k0marov/gometa/lib/generator/gen"
-	"github.com/k0marov/gometa/lib/helpers"
-	"github.com/k0marov/gometa/lib/schema"
+	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/generator/gen"
+	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/helpers"
+	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/schema"
 	"io"
 	"text/template"
 )

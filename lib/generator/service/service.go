@@ -3,8 +3,8 @@ package service
 import (
 	"bytes"
 	"fmt"
-	"github.com/k0marov/gometa/lib/generator/gen"
-	"github.com/k0marov/gometa/lib/helpers"
+	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/generator/gen"
+	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/helpers"
 	"io"
 	"text/template"
 )

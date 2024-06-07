@@ -2,7 +2,7 @@ package setup
 
 import (
 	"fmt"
-	"github.com/k0marov/gometa/lib/helpers"
+	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/helpers"
 	"go/ast"
 	"go/format"
 	"go/parser"
