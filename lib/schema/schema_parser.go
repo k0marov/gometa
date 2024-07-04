@@ -3,7 +3,7 @@ package schema
 import (
 	"encoding/json"
 	"fmt"
-	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/helpers"
+	"github.com/k0marov/gometa.git/lib/helpers"
 	"os"
 	"path/filepath"
 	"sort"

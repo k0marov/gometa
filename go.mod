@@ -1,4 +1,4 @@
-module gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git
+module github.com/k0marov/gometa.git
 
 go 1.18
 

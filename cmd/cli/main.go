@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/generator"
+	"github.com/k0marov/gometa.git/lib/generator"
 	"log"
 	"os"
 	"slices"

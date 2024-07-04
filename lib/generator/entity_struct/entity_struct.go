@@ -3,8 +3,8 @@ package entity_struct
 import (
 	"bytes"
 	"fmt"
-	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/helpers"
-	"gitlab.sch.ocrv.com.rzd/blockchain/platform/gometa.git/lib/schema"
+	"github.com/k0marov/gometa.git/lib/helpers"
+	"github.com/k0marov/gometa.git/lib/schema"
 	"io"
 	"text/template"
 )
