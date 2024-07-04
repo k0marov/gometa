@@ -109,5 +109,3 @@ func Generate(out io.Writer, genCtx gen.GenerationContext) error {
 	}
 	return nil
 }
-
-// TODO: implement pagination
