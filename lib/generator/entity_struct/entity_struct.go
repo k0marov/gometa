@@ -3,8 +3,8 @@ package entity_struct
 import (
 	"bytes"
 	"fmt"
-	"github.com/k0marov/gometa.git/lib/helpers"
-	"github.com/k0marov/gometa.git/lib/schema"
+	"github.com/k0marov/gometa/lib/helpers"
+	"github.com/k0marov/gometa/lib/schema"
 	"io"
 	"text/template"
 )

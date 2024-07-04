@@ -1,6 +1,6 @@
 # gometa 🚀
 
-Full CRUD code generator adapted for [gobase](https://github.com/wajox/gobase) template. 
+Full CRUD code Generator adapted for [gobase](https://github.com/wajox/gobase) template. 
 
 ### Installation 
 

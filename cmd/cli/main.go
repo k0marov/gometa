@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/k0marov/gometa.git/lib/generator"
+	"github.com/k0marov/gometa/lib/generator"
 	"log"
 	"os"
 	"slices"

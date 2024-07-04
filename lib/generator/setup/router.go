@@ -2,7 +2,7 @@ package setup
 
 import (
 	"fmt"
-	"github.com/k0marov/gometa.git/lib/helpers"
+	"github.com/k0marov/gometa/lib/helpers"
 	"go/ast"
 	"go/format"
 	"go/parser"

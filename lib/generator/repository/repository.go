@@ -3,8 +3,8 @@ package repository
 import (
 	"bytes"
 	"fmt"
-	"github.com/k0marov/gometa.git/lib/generator/gen"
-	"github.com/k0marov/gometa.git/lib/helpers"
+	"github.com/k0marov/gometa/lib/generator/gen"
+	"github.com/k0marov/gometa/lib/helpers"
 	"io"
 	"text/template"
 )
