@@ -10,7 +10,7 @@ go install github.com/k0marov/gometa@main
 
 ### Usage 
 
-Create a schema file for a new entity, for example [blog_post.schema.json](examples/blog_post.json). 
+Create a schema file for a new entity, for example [blog_post.schema.json](examples/blog_post.schema.json). 
 
 Navigate to your project directory and type:
 
