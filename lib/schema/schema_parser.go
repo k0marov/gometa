@@ -17,7 +17,6 @@ func Parse(filePath string) (Entity, error) {
 	if err != nil {
 		return Entity{}, err
 	}
-
 	_, fileName := filepath.Split(filePath)
 	jsonName := strings.Split(fileName, ".")[0]
 	ent := Entity{
@@ -45,11 +44,12 @@ func Parse(filePath string) (Entity, error) {
 			}
 			hasPrimaryKey = true
 		}
-
-		sort.Slice(ent.Fields, func(i, j int) bool {
-			return ent.Fields[i].JsonName == PrimaryKeyName || ent.Fields[i].GoName < ent.Fields[j].GoName
-		})
+		ent.Fields = append(ent.Fields, field)
 	}
+
+	sort.Slice(ent.Fields, func(i, j int) bool {
+		return ent.Fields[i].JsonName == PrimaryKeyName || ent.Fields[i].GoName < ent.Fields[j].GoName
+	})
 
 	if !hasPrimaryKey {
 		return Entity{}, fmt.Errorf("entity at %q does not have a primary key. Please add %q field", filePath, PrimaryKeyName)
