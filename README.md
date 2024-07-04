@@ -19,7 +19,7 @@ gometa blog_post.schema.json
 ```
 
 After that, the CRUD code for this entity (BlogPost) will be generated for all 3 layers: 
-- Presentation layer (`controllers` using [gin](https://gin-gonic.com)) 
+- Presentation layer (`controllers` using [gin](https://github.com/gin-gonic/gin)) 
 - Business logic layer (`services`) 
 - Storage layer (`repository` using [gorm](https://gorm.io)) 
 
@@ -42,3 +42,20 @@ It is possible because the generated code does not look like generated, it is fu
 - Generating mappers for conversing between DTOs for different layers 
 - Inserting into DI by editing .go files by manipulating the AST (Abstract Syntax Tree)
 - Generating Swagger annotations 
+
+### Docs 
+
+Supported Data Types for Schema: 
+- string 
+- int
+- float
+- boolean
+- Unix time (for specifying that field should be a Unix time in the `*.schema.json` file, use special value `1694801985`)
+
+Every schema should have an "id" field. 
+It can be of two variants: `uuid` and `integer autoincrement`. 
+
+To specify that this entity's ID should be an integer autoincrement, use any integer, for example `{"id": 42}`
+
+To specify that this entity's ID should be a UUID you can use any string, 
+but it will be more clear if it's a UUID string, for example `{"id": "0814a807-077c-464b-8b82-8e41e8b4c68c"}`
