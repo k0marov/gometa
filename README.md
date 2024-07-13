@@ -2,6 +2,8 @@
 
 Full CRUD code Generator adapted for [gobase](https://github.com/wajox/gobase) template. 
 
+Demonstration: [https://www.youtube.com/watch?v=0VXVqYL0LhA](https://www.youtube.com/watch?v=0VXVqYL0LhA)
+
 ### Installation 
 
 ```bash
