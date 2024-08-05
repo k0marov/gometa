@@ -68,6 +68,8 @@ func (t FieldType) GolangType() string {
 		return "string"
 	case TimeUnix:
 		return "time.Time"
+	case Bool:
+		return "bool"
 	}
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"
@@ -84,6 +86,8 @@ func (t FieldType) JsonType() string {
 		return "string"
 	case TimeUnix:
 		return "int"
+	case Bool:
+		return "bool"
 	}
 	log.Panicf("Unknown field type %s", t)
 	return "UNKNOWN"
